@@ -1,9 +1,8 @@
 package com.xujiayao.discord_mc_chat.minecraft.events;
 
 import com.xujiayao.discord_mc_chat.DMCC;
+import com.xujiayao.discord_mc_chat.minecraft.commands.MinecraftCommands;
 import com.xujiayao.discord_mc_chat.utils.events.EventManager;
-
-import static com.xujiayao.discord_mc_chat.Constants.LOGGER;
 
 /**
  * Handles Minecraft events posted from the event manager.
@@ -23,7 +22,8 @@ public class MinecraftEventHandler {
 		});
 
 		EventManager.register(MinecraftEvents.CommandRegister.class, event -> {
-			LOGGER.info("[DMCC] Registering commands...");
+			// Register Minecraft /dmcc commands
+			MinecraftCommands.register(event.dispatcher());
 		});
 	}
 }

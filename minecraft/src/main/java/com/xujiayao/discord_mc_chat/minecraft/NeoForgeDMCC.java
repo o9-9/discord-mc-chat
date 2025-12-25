@@ -16,9 +16,10 @@ public class NeoForgeDMCC {
 	 * Start NeoForge DMCC.
 	 */
 	public NeoForgeDMCC() {
-		// Initialize Minecraft event handlers first to get "/dmcc reload" working
-		MinecraftEventHandler.init();
-
 		DMCC.init();
+
+		// Minecraft commands have to be registered after DMCC is initialized
+		// to apply command permission levels from the config
+		MinecraftEventHandler.init();
 	}
 }
