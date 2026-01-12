@@ -1,18 +1,17 @@
 package com.xujiayao.discord_mc_chat;
 
 import com.xujiayao.discord_mc_chat.client.ClientDMCC;
+import com.xujiayao.discord_mc_chat.commands.CommandManager;
 import com.xujiayao.discord_mc_chat.server.ServerDMCC;
 import com.xujiayao.discord_mc_chat.utils.ExecutorServiceUtils;
 import com.xujiayao.discord_mc_chat.utils.config.ConfigManager;
 import com.xujiayao.discord_mc_chat.utils.config.ModeManager;
 import com.xujiayao.discord_mc_chat.utils.events.EventManager;
 import com.xujiayao.discord_mc_chat.utils.i18n.I18nManager;
-import com.xujiayao.discord_mc_chat.utils.logging.impl.LoggerImpl;
 import okhttp3.Cache;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import static com.xujiayao.discord_mc_chat.Constants.IS_MINECRAFT_ENV;
 import static com.xujiayao.discord_mc_chat.Constants.LOGGER;
@@ -78,9 +77,14 @@ public class DMCC {
 					return false;
 				}
 
-				if (!ModeManager.load() // Determine operating mode
+				boolean configs = !ModeManager.load() // Determine operating mode
 						|| !ConfigManager.load() // Load configuration
-						|| !I18nManager.load(ConfigManager.getString("language"))) { // Load all translations
+						|| !I18nManager.load(ConfigManager.getString("language", "en_us")); // Load all translations
+
+				// Initialize command system after internal translations and operating mode are loaded
+				CommandManager.initialize();
+
+				if (configs) {
 					if (IS_MINECRAFT_ENV) {
 						LOGGER.warn("Please correct the errors mentioned above, then run \"/dmcc reload\".");
 					} else {
@@ -138,7 +142,7 @@ public class DMCC {
 	 */
 	public static boolean shutdown() {
 		try (ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "DMCC-Shutdown"))) {
-			Future<Boolean> future = executor.submit(() -> {
+			return executor.submit(() -> {
 				if (clientInstance != null) {
 					clientInstance.shutdown();
 				}
@@ -160,14 +164,9 @@ public class DMCC {
 					return false;
 				}
 
-				LOGGER.info("DMCC shutdown successfully. Goodbye!");
+				LOGGER.info("DMCC shutdown successfully!");
 				return true;
-			});
-
-			// Close the file logger
-			LoggerImpl.closeFileWriter();
-
-			return future.get();
+			}).get();
 		} catch (Exception e) {
 			LOGGER.error("An error occurred during DMCC shutdown", e);
 			return false;
@@ -175,17 +174,13 @@ public class DMCC {
 	}
 
 	/**
-	 * Reloads DMCC by shutting it down and re-initializing.
+	 * Reloads DMCC by shutting it down and re-initializing (if shutdown is successful).
 	 *
 	 * @return true if reload is successful, false otherwise
 	 */
 	public static boolean reload() {
-		if (shutdown() && init()) {
-			LOGGER.info("DMCC reloaded successfully!");
-			return true;
-		} else {
-			LOGGER.error("DMCC reload failed!");
-			return false;
-		}
+		LOGGER.info("Reloading DMCC...");
+
+		return shutdown() && init();
 	}
 }
