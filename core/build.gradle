@@ -23,6 +23,8 @@ dependencies {
     shadow api("com.squareup.okhttp3:okhttp:${okhttp_version}")
 
 //    shadow api("io.netty:netty-handler:${netty_version}")
+
+    shadow api("org.fusesource.jansi:jansi:${jansi_version}")
 }
 
 jar {
