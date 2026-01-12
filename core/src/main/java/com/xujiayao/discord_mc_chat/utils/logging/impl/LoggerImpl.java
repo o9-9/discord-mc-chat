@@ -102,6 +102,8 @@ public class LoggerImpl implements Logger {
 
 	/**
 	 * Closes the file writer if it was initialized and uninstalls AnsiConsole.
+	 * <p>
+	 * Only Standalone environment requires this cleanup.
 	 */
 	public static void shutdown() {
 		if (fileWriter != null) {

@@ -1,6 +1,7 @@
 package com.xujiayao.discord_mc_chat.standalone;
 
 import com.xujiayao.discord_mc_chat.DMCC;
+import com.xujiayao.discord_mc_chat.utils.logging.impl.LoggerImpl;
 
 /**
  * The entry point for Standalone environment.
@@ -16,7 +17,12 @@ public class StandaloneDMCC {
 	 */
 	public static void main(String[] args) {
 		// Register shutdown hook for standalone mode
-		Runtime.getRuntime().addShutdownHook(new Thread(DMCC::shutdown, "DMCC-ShutdownHook"));
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			DMCC.shutdown();
+
+			// Logger cleanup
+			LoggerImpl.shutdown();
+		}, "DMCC-ShutdownHook"));
 
 		// Initialize DMCC, block until initialization is complete
 		if (DMCC.init()) {
