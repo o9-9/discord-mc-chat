@@ -164,12 +164,12 @@ public class LoggerImpl implements Logger {
 
 	@Override
 	public boolean isTraceEnabled() {
-		return true;
+		return false;
 	}
 
 	@Override
 	public boolean isDebugEnabled() {
-		return true;
+		return false;
 	}
 
 	@Override
@@ -189,12 +189,12 @@ public class LoggerImpl implements Logger {
 
 	@Override
 	public boolean isTraceEnabled(Marker marker) {
-		return true;
+		return false;
 	}
 
 	@Override
 	public boolean isDebugEnabled(Marker marker) {
-		return true;
+		return false;
 	}
 
 	@Override
