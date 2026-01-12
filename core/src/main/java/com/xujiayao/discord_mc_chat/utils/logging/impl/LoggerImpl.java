@@ -2,6 +2,8 @@ package com.xujiayao.discord_mc_chat.utils.logging.impl;
 
 import com.xujiayao.discord_mc_chat.utils.EnvironmentUtils;
 import com.xujiayao.discord_mc_chat.utils.StringUtils;
+import org.fusesource.jansi.Ansi;
+import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 
@@ -17,6 +19,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.fusesource.jansi.Ansi.ansi;
+
 /**
  * DMCC Logger implementation.
  *
@@ -26,6 +30,13 @@ public class LoggerImpl implements Logger {
 
 	private static volatile PrintWriter fileWriter;
 	private static boolean fileWriterInitialized = false;
+
+	// Ensure AnsiConsole is installed only once and only if in Standalone environment
+	static {
+		if (!EnvironmentUtils.isMinecraftEnvironment()) {
+			AnsiConsole.systemInstall();
+		}
+	}
 
 	private final String name;
 
@@ -90,11 +101,14 @@ public class LoggerImpl implements Logger {
 	}
 
 	/**
-	 * Closes the file writer if it was initialized.
+	 * Closes the file writer if it was initialized and uninstalls AnsiConsole.
 	 */
-	public static void closeFileWriter() {
+	public static void shutdown() {
 		if (fileWriter != null) {
 			fileWriter.close();
+		}
+		if (!EnvironmentUtils.isMinecraftEnvironment()) {
+			AnsiConsole.systemUninstall();
 		}
 	}
 
@@ -134,18 +148,34 @@ public class LoggerImpl implements Logger {
 			String time = new SimpleDateFormat("HH:mm:ss").format(System.currentTimeMillis());
 			String thread = Thread.currentThread().getName();
 
-			String formattedMessage = StringUtils.format("[{}] [{}/{}]: {}", time, thread, level, msg);
-
-			System.out.println(formattedMessage);
+			// 1. Log to File (Plain Text, no colors)
 			if (fileWriter != null) {
-				fileWriter.println(formattedMessage);
+				fileWriter.println(StringUtils.format("[{}] [{}/{}]: {}", time, thread, level, msg));
+				if (t != null) {
+					t.printStackTrace(fileWriter);
+				}
 			}
+
+			// 2. Log to Console (With Jansi Colors)
+			Ansi.Color color = switch (level) {
+				case "INFO" -> Ansi.Color.GREEN;
+				case "WARN" -> Ansi.Color.YELLOW;
+				case "ERROR" -> Ansi.Color.RED;
+				default -> Ansi.Color.DEFAULT;
+			};
+
+			// Build the colored string using Jansi fluent API
+			// Only color the LEVEL part
+			String consoleMessage = ansi()
+					.a("[").a(time).a("] ")
+					.a("[").a(thread).a("/").fg(color).a(level).reset().a("]: ")
+					.a(msg)
+					.toString();
+
+			System.out.println(consoleMessage);
 
 			if (t != null) {
 				t.printStackTrace(System.out);
-				if (fileWriter != null) {
-					t.printStackTrace(fileWriter);
-				}
 			}
 		}
 	}
