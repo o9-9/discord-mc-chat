@@ -1,9 +1,7 @@
 package com.xujiayao.discord_mc_chat.commands.impl;
 
-import com.xujiayao.discord_mc_chat.DMCC;
 import com.xujiayao.discord_mc_chat.commands.Command;
 import com.xujiayao.discord_mc_chat.commands.CommandSender;
-import com.xujiayao.discord_mc_chat.standalone.StandaloneDMCC;
 import com.xujiayao.discord_mc_chat.utils.i18n.I18nManager;
 
 /**

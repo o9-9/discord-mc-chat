@@ -11,8 +11,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.xujiayao.discord_mc_chat.Constants.LOGGER;
-
 /**
  * Central registry and dispatcher for DMCC commands.
  *

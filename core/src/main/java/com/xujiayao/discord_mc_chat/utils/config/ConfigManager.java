@@ -150,12 +150,12 @@ public class ConfigManager {
 	/**
 	 * Gets a configuration value as a string, with a default value if not found.
 	 *
-	 * @param path The path to the configuration value
+	 * @param path         The path to the configuration value
 	 * @param defaultValue The default value to return if the path is not found
 	 * @return The string value at the specified path, or null if not found
 	 */
 	public static String getString(String path, String defaultValue) {
-		String value  = getValue(path, JsonNode::asText);
+		String value = getValue(path, JsonNode::asText);
 		return value == null ? defaultValue : value;
 	}
 
@@ -172,12 +172,12 @@ public class ConfigManager {
 	/**
 	 * Gets a configuration value as an integer, with a default value if not found.
 	 *
-	 * @param path The path to the configuration value
+	 * @param path         The path to the configuration value
 	 * @param defaultValue The default value to return if the path is not found
 	 * @return The integer value at the specified path
 	 */
 	public static Integer getInt(String path, int defaultValue) {
-		Integer value  = getValue(path, JsonNode::asInt);
+		Integer value = getValue(path, JsonNode::asInt);
 		return value == null ? defaultValue : value;
 	}
 
