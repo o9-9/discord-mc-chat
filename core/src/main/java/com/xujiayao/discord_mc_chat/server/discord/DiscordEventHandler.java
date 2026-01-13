@@ -1,5 +1,6 @@
 package com.xujiayao.discord_mc_chat.server.discord;
 
+import com.xujiayao.discord_mc_chat.commands.CommandManager;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
@@ -21,6 +22,9 @@ public class DiscordEventHandler extends ListenerAdapter {
 	@Override
 	public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
 		event.deferReply().queue();
+
+		// TODO Confirm whether event.getName() is correct
+		CommandManager.execute(new JdaCommandSender(event), event.getName());
 	}
 
 	@Override

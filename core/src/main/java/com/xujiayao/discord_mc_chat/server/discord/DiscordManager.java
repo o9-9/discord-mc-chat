@@ -1,14 +1,18 @@
 package com.xujiayao.discord_mc_chat.server.discord;
 
 import com.xujiayao.discord_mc_chat.utils.config.ConfigManager;
+import com.xujiayao.discord_mc_chat.utils.config.ModeManager;
 import com.xujiayao.discord_mc_chat.utils.i18n.I18nManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.xujiayao.discord_mc_chat.Constants.LOGGER;
 
@@ -47,10 +51,15 @@ public class DiscordManager {
 
 			LOGGER.info("Discord bot is ready. Logged in as tag: \"{}\"", jda.getSelfUser().getAsTag());
 
+			List<CommandData> commands = new ArrayList<>();
+			commands.add(Commands.slash("help", I18nManager.getDmccTranslation("commands.help.description")));
+			commands.add(Commands.slash("reload", I18nManager.getDmccTranslation("commands.reload.description")));
+			if ("standalone".equals(ModeManager.getMode())) {
+				commands.add(Commands.slash("shutdown", I18nManager.getDmccTranslation("commands.shutdown.description")));
+			}
+
 			jda.updateCommands()
-					.addCommands(Commands.slash("help", I18nManager.getDmccTranslation("commands.help.description")))
-					.addCommands(Commands.slash("reload", I18nManager.getDmccTranslation("commands.reload.description")))
-					.addCommands(Commands.slash("shutdown", I18nManager.getDmccTranslation("commands.shutdown.description")))
+					.addCommands(commands)
 					.queue();
 
 			return true;

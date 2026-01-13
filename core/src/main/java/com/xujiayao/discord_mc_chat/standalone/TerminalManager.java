@@ -1,5 +1,7 @@
 package com.xujiayao.discord_mc_chat.standalone;
 
+import com.xujiayao.discord_mc_chat.commands.CommandManager;
+import com.xujiayao.discord_mc_chat.commands.CommandSender;
 import com.xujiayao.discord_mc_chat.utils.i18n.I18nManager;
 
 import java.util.Scanner;
@@ -33,20 +35,12 @@ public class TerminalManager {
 					if (scanner.hasNextLine()) {
 						String line = scanner.nextLine();
 
+						// Remove leading slash if present
 						if (line.startsWith("/")) {
 							line = line.substring(1);
 						}
 
-						String command = line.trim().split("\\s+")[0];
-						// Arguments do not include the command itself
-						String[] args = line.trim().split("\\s+").length > 1
-								? line.trim().split("\\s+", 2)[1].split("\\s+")
-								: new String[0];
-
-						// TODO Handle command
-						if (true) {
-							LOGGER.error(I18nManager.getDmccTranslation("terminal.unknown_command", line));
-						}
+						CommandManager.execute(new TerminalCommandSender(), line);
 					}
 				} catch (IllegalStateException e) {
 					// This can happen if System.in is closed externally, which signals the end.
@@ -60,5 +54,21 @@ public class TerminalManager {
 
 		terminalThread.setDaemon(true);
 		terminalThread.start();
+	}
+
+	/**
+	 * A CommandSender implementation for terminal commands.
+	 *
+	 * @author Xujiayao
+	 */
+	private static class TerminalCommandSender implements CommandSender {
+
+		@Override
+		public void reply(String message) {
+			// For each line in the message, send a separate log message
+			for (String line : message.split("\n")) {
+				LOGGER.info(line);
+			}
+		}
 	}
 }
