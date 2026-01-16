@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -69,10 +68,10 @@ public class DiscordManager {
 				commands.add(Commands.slash("shutdown", I18nManager.getDmccTranslation("commands.shutdown.description")));
 			}
 
-			CompletableFuture<List<Command>> updateFuture = jda.updateCommands().addCommands((Collection<? extends CommandData>) null).submit();
+			CompletableFuture<List<Command>> updateFuture = jda.updateCommands().addCommands(commands).submit();
 			CompletableFuture<Void> checkFuture = CompletableFuture.runAsync(() -> {
 				if (!updateFuture.isDone()) {
-					LOGGER.info("Registering Discord DMCC commands, this may take a while (around 1 minute)...");
+					LOGGER.warn("Registering Discord DMCC commands, this may take a while (around 1 minute)...");
 				}
 			}, CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS, executor));
 			updateFuture.join();
