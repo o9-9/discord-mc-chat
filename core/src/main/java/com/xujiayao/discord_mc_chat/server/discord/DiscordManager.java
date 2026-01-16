@@ -5,6 +5,7 @@ import com.xujiayao.discord_mc_chat.utils.config.ModeManager;
 import com.xujiayao.discord_mc_chat.utils.i18n.I18nManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -12,7 +13,12 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static com.xujiayao.discord_mc_chat.Constants.LOGGER;
 
@@ -50,7 +56,12 @@ public class DiscordManager {
 			jda.awaitReady();
 
 			LOGGER.info("Discord bot is ready. Logged in as tag: \"{}\"", jda.getSelfUser().getAsTag());
+		} catch (Exception e) {
+			LOGGER.error("Discord bot initialization was interrupted", e);
+		}
 
+		// Blocks until commands are updated
+		try (ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "DMCC-FutureChecker"))) {
 			List<CommandData> commands = new ArrayList<>();
 			commands.add(Commands.slash("help", I18nManager.getDmccTranslation("commands.help.description")));
 			commands.add(Commands.slash("reload", I18nManager.getDmccTranslation("commands.reload.description")));
@@ -58,13 +69,19 @@ public class DiscordManager {
 				commands.add(Commands.slash("shutdown", I18nManager.getDmccTranslation("commands.shutdown.description")));
 			}
 
-			jda.updateCommands()
-					.addCommands(commands)
-					.queue();
+			CompletableFuture<List<Command>> updateFuture = jda.updateCommands().addCommands((Collection<? extends CommandData>) null).submit();
+			CompletableFuture<Void> checkFuture = CompletableFuture.runAsync(() -> {
+				if (!updateFuture.isDone()) {
+					LOGGER.info("Registering Discord DMCC commands, this may take a while (around 1 minute)...");
+				}
+			}, CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS, executor));
+			updateFuture.join();
+			checkFuture.cancel(false);
 
+			LOGGER.info("Discord DMCC commands registered successfully!");
 			return true;
 		} catch (Exception e) {
-			LOGGER.error("Discord bot initialization was interrupted", e);
+			LOGGER.error("Failed to register Discord DMCC commands", e);
 		}
 
 		return false;
