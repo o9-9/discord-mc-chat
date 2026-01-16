@@ -52,7 +52,8 @@ public class TerminalManager {
 			scanner.close();
 		}, "DMCC-Terminal");
 
-		terminalThread.setDaemon(true);
+		// Cannot set as daemon thread. Problematic.
+		// terminalThread.setDaemon(true);
 		terminalThread.start();
 	}
 
