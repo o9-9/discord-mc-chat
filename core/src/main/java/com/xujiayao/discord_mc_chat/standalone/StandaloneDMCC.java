@@ -28,6 +28,8 @@ public class StandaloneDMCC {
 		if (DMCC.init()) {
 			// Initialize terminal only if DMCC initialized successfully
 			TerminalManager.init();
+		} else {
+			System.exit(-1);
 		}
 	}
 }
