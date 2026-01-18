@@ -18,9 +18,11 @@ commands:
     help: "帮助"
   reload:
     description: "重新加载 DMCC 以应用最新配置"
+    reloading: "正在重新加载 DMCC..."
     success: "DMCC 重新加载成功！"
-    failure: "DMCC 重新加载失败。原因：{}"
+    failure: "DMCC 重新加载失败。"
   shutdown:
     description: "关闭独立 DMCC 应用程序"
+    shutting_down: "正在关闭 DMCC..."
     success: "DMCC 关闭成功。再见！"
-    failure: "DMCC 关闭失败。原因：{}"
+    failure: "DMCC 关闭失败。"

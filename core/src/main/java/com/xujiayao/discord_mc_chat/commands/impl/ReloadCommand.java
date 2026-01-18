@@ -30,10 +30,12 @@ public class ReloadCommand implements Command {
 	@Override
 	public void execute(CommandSender sender, String... args) {
 		Thread thread = new Thread(() -> {
+			sender.reply(I18nManager.getDmccTranslation("commands.reload.reloading"));
+
 			if (DMCC.reload()) {
 				sender.reply(I18nManager.getDmccTranslation("commands.reload.success"));
 			} else {
-				sender.reply(I18nManager.getDmccTranslation("commands.reload.failure", "See logs for details"));
+				sender.reply(I18nManager.getDmccTranslation("commands.reload.failure"));
 			}
 		}, "DMCC-ReloadCommand");
 		thread.start();

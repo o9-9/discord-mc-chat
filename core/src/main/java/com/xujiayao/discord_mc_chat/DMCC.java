@@ -164,7 +164,7 @@ public class DMCC {
 					return false;
 				}
 
-				LOGGER.info("DMCC shutdown successfully!");
+				LOGGER.info("DMCC shut down successfully!");
 				return true;
 			}).get();
 		} catch (Exception e) {
@@ -179,8 +179,6 @@ public class DMCC {
 	 * @return true if reload is successful, false otherwise
 	 */
 	public static boolean reload() {
-		LOGGER.info("Reloading DMCC...");
-
 		return shutdown() && init();
 	}
 }

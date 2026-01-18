@@ -1,8 +1,12 @@
 package com.xujiayao.discord_mc_chat.commands.impl;
 
+import com.xujiayao.discord_mc_chat.DMCC;
 import com.xujiayao.discord_mc_chat.commands.Command;
 import com.xujiayao.discord_mc_chat.commands.CommandSender;
 import com.xujiayao.discord_mc_chat.utils.i18n.I18nManager;
+import com.xujiayao.discord_mc_chat.utils.logging.impl.LoggerImpl;
+
+import static com.xujiayao.discord_mc_chat.standalone.StandaloneDMCC.SHUTDOWN_THREAD;
 
 /**
  * Shutdown command implementation (standalone only).
@@ -28,6 +32,22 @@ public class ShutdownCommand implements Command {
 
 	@Override
 	public void execute(CommandSender sender, String... args) {
-		System.exit(0);
+		Thread thread = new Thread(() -> {
+			sender.reply(I18nManager.getDmccTranslation("commands.shutdown.shutting_down"));
+
+			if (DMCC.shutdown()) {
+				sender.reply(I18nManager.getDmccTranslation("commands.shutdown.success"));
+
+				Runtime.getRuntime().removeShutdownHook(SHUTDOWN_THREAD);
+
+				// Logger cleanup
+				LoggerImpl.shutdown();
+
+				System.exit(0);
+			} else {
+				sender.reply(I18nManager.getDmccTranslation("commands.shutdown.failure"));
+			}
+		}, "DMCC-ShutdownCommand");
+		thread.start();
 	}
 }

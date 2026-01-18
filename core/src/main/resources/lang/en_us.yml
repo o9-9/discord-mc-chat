@@ -18,9 +18,11 @@ commands:
     help: "Help"
   reload:
     description: "Reload DMCC to apply latest configuration changes"
+    reloading: "Reloading DMCC..."
     success: "DMCC reloaded successfully!"
-    failure: "DMCC reload failed. Reason: {}"
+    failure: "DMCC reload failed."
   shutdown:
     description: "Shut down the Standalone DMCC application"
+    shutting_down: "Shutting down DMCC..."
     success: "DMCC shut down successfully. Goodbye!"
-    failure: "DMCC shutdown failed. Reason: {}"
+    failure: "DMCC shutdown failed."

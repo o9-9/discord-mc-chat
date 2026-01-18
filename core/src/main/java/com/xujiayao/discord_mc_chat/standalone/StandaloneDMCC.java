@@ -10,6 +10,13 @@ import com.xujiayao.discord_mc_chat.utils.logging.impl.LoggerImpl;
  */
 public class StandaloneDMCC {
 
+	public static final Thread SHUTDOWN_THREAD = new Thread(() -> {
+		DMCC.shutdown();
+
+		// Logger cleanup
+		LoggerImpl.shutdown();
+	}, "DMCC-ShutdownHook");
+
 	/**
 	 * Start Standalone DMCC.
 	 *
@@ -17,12 +24,7 @@ public class StandaloneDMCC {
 	 */
 	public static void main(String[] args) {
 		// Register shutdown hook for standalone mode
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-			DMCC.shutdown();
-
-			// Logger cleanup
-			LoggerImpl.shutdown();
-		}, "DMCC-ShutdownHook"));
+		Runtime.getRuntime().addShutdownHook(SHUTDOWN_THREAD);
 
 		// Initialize DMCC, block until initialization is complete
 		if (DMCC.init()) {
