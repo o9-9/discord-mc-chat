@@ -30,10 +30,10 @@ commands:
 
 main:
   init:
-    info_minecraft_env: "正在 Minecraft 环境中初始化 DMCC {}。"
-    info_standalone_env: "正在独立环境中初始化 DMCC {}。"
-    reload_prompt: "请更正上述错误，然后运行 \"/dmcc reload\"。"
-    restart_prompt: "请更正上述错误，然后重新启动 DMCC。"
+    info_minecraft_env: "正在 Minecraft 环境中初始化 DMCC..."
+    info_standalone_env: "正在独立环境中初始化 DMCC..."
+    minecraft_reload_prompt: "请更正上述错误，然后运行 \"/dmcc reload\"。"
+    standalone_reload_prompt: "请更正上述错误，然后重新加载 DMCC。"
     success: "DMCC 初始化成功！"
     failed: "DMCC 初始化期间发生错误。"
   shutdown:
@@ -43,7 +43,7 @@ main:
 
 discord:
   manager:
-    token_missing: "配置文件中未设置 Discord 机器人令牌！"
+    token_missing: "配置文件中未设置 Discord 机器人令牌。"
     init_interrupted: "Discord 机器人初始化被中断。"
     waiting_ready: "正在等待 JDA 就绪。这可能需要一段时间...（理应在 1 分钟以内）"
     ready: "Discord 机器人已就绪。登录标签为：\"{}\""
@@ -73,7 +73,7 @@ utils:
       not_found: "配置文件未找到或为空。"
       creating: "正在于 \"{}\" 创建默认文件。"
       edit_prompt: "请在重新加载 DMCC 之前编辑 \"{}\"。"
-      mode_mismatch: "检测到模式不匹配！"
+      mode_mismatch: "检测到模式不匹配。"
       mode_mismatch_detail: "期望的模式是 \"{}\"（来自 mode.yml 或环境），但 config.yml 是针对 \"{}\" 的。"
       backup_prompt: "请备份并删除现有的 config.yml，以便 DMCC 生成新的正确文件。"
       validation_failed: "config.yml 验证失败。"
@@ -99,3 +99,4 @@ utils:
     custom_edit_prompt: "如果你希望自定义消息，请编辑 \"{}\" 并重新加载 DMCC。"
     custom_validation_failed: "自定义消息配置验证失败。"
     custom_load_failed: "加载自定义消息失败。"
+    fully_loaded: "DMCC 语言资源已完全加载！"

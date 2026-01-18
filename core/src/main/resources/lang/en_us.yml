@@ -30,10 +30,10 @@ commands:
 
 main:
   init:
-    info_minecraft_env: "Initializing DMCC {} in a Minecraft environment."
-    info_standalone_env: "Initializing DMCC {} in a Standalone environment."
-    reload_prompt: "Please correct the errors mentioned above, then run \"/dmcc reload\"."
-    restart_prompt: "Please correct the errors mentioned above, then restart DMCC."
+    info_minecraft_env: "Initializing DMCC in a Minecraft environment..."
+    info_standalone_env: "Initializing DMCC in a Standalone environment..."
+    minecraft_reload_prompt: "Please correct the errors mentioned above, then run \"/dmcc reload\"."
+    standalone_reload_prompt: "Please correct the errors mentioned above, then reload DMCC."
     success: "DMCC initialized successfully!"
     failed: "An error occurred during DMCC initialization."
   shutdown:
@@ -43,7 +43,7 @@ main:
 
 discord:
   manager:
-    token_missing: "Discord bot token is not set in the config file!"
+    token_missing: "Discord bot token is not set in the config file."
     init_interrupted: "Discord bot initialization was interrupted."
     waiting_ready: "Waiting for JDA to be ready. This may take a while... (should be within 1 minute)"
     ready: "Discord bot is ready. Logged in as tag: \"{}\""
@@ -73,7 +73,7 @@ utils:
       not_found: "Configuration file not found or is empty."
       creating: "Creating a default one at \"{}\"."
       edit_prompt: "Please edit \"{}\" before reloading DMCC."
-      mode_mismatch: "Mode mismatch detected!"
+      mode_mismatch: "Mode mismatch detected."
       mode_mismatch_detail: "The expected mode is \"{}\" (from mode.yml or environment), but config.yml is for \"{}\"."
       backup_prompt: "Please backup and delete your existing config.yml to allow DMCC to generate a new and correct one."
       validation_failed: "Validation of config.yml failed."
@@ -99,3 +99,4 @@ utils:
     custom_edit_prompt: "If you wish to customize messages, please edit \"{}\" and reload DMCC."
     custom_validation_failed: "Validation of custom message config failed."
     custom_load_failed: "Failed to load custom messages."
+    fully_loaded: "DMCC language resources fully loaded!"
