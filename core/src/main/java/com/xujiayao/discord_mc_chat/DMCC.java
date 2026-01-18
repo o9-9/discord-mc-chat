@@ -71,9 +71,9 @@ public class DMCC {
 				}
 
 				if (IS_MINECRAFT_ENV) {
-					LOGGER.info(I18nManager.getDmccTranslation("main.init.info_minecraft_env", VERSION));
+					LOGGER.info(I18nManager.getDmccTranslation("main.init.info_minecraft_env"));
 				} else {
-					LOGGER.info(I18nManager.getDmccTranslation("main.init.info_standalone_env", VERSION));
+					LOGGER.info(I18nManager.getDmccTranslation("main.init.info_standalone_env"));
 				}
 
 				// If configuration fails to load, exit the DMCC-Init thread gracefully
@@ -90,9 +90,9 @@ public class DMCC {
 
 				if (configs) {
 					if (IS_MINECRAFT_ENV) {
-						LOGGER.warn(I18nManager.getDmccTranslation("main.init.reload_prompt"));
+						LOGGER.warn(I18nManager.getDmccTranslation("main.init.minecraft_reload_prompt"));
 					} else {
-						LOGGER.warn(I18nManager.getDmccTranslation("main.init.restart_prompt"));
+						LOGGER.warn(I18nManager.getDmccTranslation("main.init.standalone_reload_prompt"));
 					}
 					return false;
 				}
