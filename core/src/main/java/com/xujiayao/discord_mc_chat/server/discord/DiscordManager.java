@@ -1,5 +1,6 @@
 package com.xujiayao.discord_mc_chat.server.discord;
 
+import com.xujiayao.discord_mc_chat.utils.ExecutorServiceUtils;
 import com.xujiayao.discord_mc_chat.utils.config.ConfigManager;
 import com.xujiayao.discord_mc_chat.utils.config.ModeManager;
 import com.xujiayao.discord_mc_chat.utils.i18n.I18nManager;
@@ -42,9 +43,10 @@ public class DiscordManager {
 			return false;
 		}
 
-		try {
-			// Blocks until JDA is ready
-			try (ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "DMCC-FutureChecker"))) {
+		// Use a custom executor with our special ThreadFactory to ensure ClassLoader is correct
+		try (ExecutorService executor = Executors.newCachedThreadPool(ExecutorServiceUtils.newThreadFactory("DMCC-DiscordInit"))) {
+			try {
+				// Blocks until JDA is ready
 				CompletableFuture<Void> readyFuture = CompletableFuture.runAsync(() -> {
 					try {
 						jda = JDABuilder.createDefault(token)
@@ -60,7 +62,7 @@ public class DiscordManager {
 					} catch (InterruptedException e) {
 						LOGGER.error(I18nManager.getDmccTranslation("discord.manager.init_interrupted"), e);
 					}
-				});
+				}, executor);
 
 				CompletableFuture<Void> checkFuture = CompletableFuture.runAsync(() -> {
 					if (!readyFuture.isDone()) {
@@ -70,39 +72,42 @@ public class DiscordManager {
 
 				readyFuture.join();
 				checkFuture.cancel(false);
+
+				LOGGER.info(I18nManager.getDmccTranslation("discord.manager.ready", jda.getSelfUser().getAsTag()));
+			} catch (Exception e) {
+				LOGGER.error(I18nManager.getDmccTranslation("discord.manager.init_interrupted"), e);
 			}
 
-			LOGGER.info(I18nManager.getDmccTranslation("discord.manager.ready", jda.getSelfUser().getAsTag()));
-		} catch (Exception e) {
-			LOGGER.error(I18nManager.getDmccTranslation("discord.manager.init_interrupted"), e);
-		}
-
-		if (jda == null || jda.getStatus() != JDA.Status.CONNECTED) {
-			return false;
-		}
-
-		// Blocks until commands are updated
-		try (ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "DMCC-FutureChecker"))) {
-			List<CommandData> commands = new ArrayList<>();
-			commands.add(Commands.slash("help", I18nManager.getDmccTranslation("commands.help.description")));
-			commands.add(Commands.slash("reload", I18nManager.getDmccTranslation("commands.reload.description")));
-			if ("standalone".equals(ModeManager.getMode())) {
-				commands.add(Commands.slash("shutdown", I18nManager.getDmccTranslation("commands.shutdown.description")));
+			if (jda == null || jda.getStatus() != JDA.Status.CONNECTED) {
+				// Don't forget to shut down the temporary executor
+				executor.shutdown();
+				return false;
 			}
 
-			CompletableFuture<List<Command>> updateFuture = jda.updateCommands().addCommands(commands).submit();
-			CompletableFuture<Void> checkFuture = CompletableFuture.runAsync(() -> {
-				if (!updateFuture.isDone()) {
-					LOGGER.warn(I18nManager.getDmccTranslation("discord.manager.registering_commands"));
+			// Blocks until commands are updated
+			try {
+				List<CommandData> commands = new ArrayList<>();
+				commands.add(Commands.slash("help", I18nManager.getDmccTranslation("commands.help.description")));
+				commands.add(Commands.slash("reload", I18nManager.getDmccTranslation("commands.reload.description")));
+				if ("standalone".equals(ModeManager.getMode())) {
+					commands.add(Commands.slash("shutdown", I18nManager.getDmccTranslation("commands.shutdown.description")));
 				}
-			}, CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS, executor));
-			updateFuture.join();
-			checkFuture.cancel(false);
 
-			LOGGER.info(I18nManager.getDmccTranslation("discord.manager.commands_success"));
-			return true;
-		} catch (Exception e) {
-			LOGGER.error(I18nManager.getDmccTranslation("discord.manager.commands_failed"), e);
+				CompletableFuture<List<Command>> updateFuture = jda.updateCommands().addCommands(commands).submit();
+				CompletableFuture<Void> checkFuture = CompletableFuture.runAsync(() -> {
+					if (!updateFuture.isDone()) {
+						LOGGER.warn(I18nManager.getDmccTranslation("discord.manager.registering_commands"));
+					}
+				}, CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS, executor));
+
+				updateFuture.join();
+				checkFuture.cancel(false);
+
+				LOGGER.info(I18nManager.getDmccTranslation("discord.manager.commands_success"));
+				return true;
+			} catch (Exception e) {
+				LOGGER.error(I18nManager.getDmccTranslation("discord.manager.commands_failed"), e);
+			}
 		}
 
 		return false;
