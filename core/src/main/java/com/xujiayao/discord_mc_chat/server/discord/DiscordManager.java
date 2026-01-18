@@ -43,19 +43,19 @@ public class DiscordManager {
 		}
 
 		try {
-			jda = JDABuilder.createDefault(token)
-					.enableIntents(
-							GatewayIntent.MESSAGE_CONTENT,
-							GatewayIntent.GUILD_MEMBERS
-					)
-					.setMemberCachePolicy(MemberCachePolicy.ALL)
-					.addEventListeners(new DiscordEventHandler())
-					.build();
-
 			// Blocks until JDA is ready
 			try (ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "DMCC-FutureChecker"))) {
 				CompletableFuture<Void> readyFuture = CompletableFuture.runAsync(() -> {
 					try {
+						jda = JDABuilder.createDefault(token)
+								.enableIntents(
+										GatewayIntent.MESSAGE_CONTENT,
+										GatewayIntent.GUILD_MEMBERS
+								)
+								.setMemberCachePolicy(MemberCachePolicy.ALL)
+								.addEventListeners(new DiscordEventHandler())
+								.build();
+
 						jda.awaitReady();
 					} catch (InterruptedException e) {
 						LOGGER.error(I18nManager.getDmccTranslation("discord.manager.init_interrupted"), e);
@@ -75,6 +75,10 @@ public class DiscordManager {
 			LOGGER.info(I18nManager.getDmccTranslation("discord.manager.ready", jda.getSelfUser().getAsTag()));
 		} catch (Exception e) {
 			LOGGER.error(I18nManager.getDmccTranslation("discord.manager.init_interrupted"), e);
+		}
+
+		if (jda == null || jda.getStatus() != JDA.Status.CONNECTED) {
+			return false;
 		}
 
 		// Blocks until commands are updated
@@ -121,6 +125,8 @@ public class DiscordManager {
 			} catch (Exception ignored) {
 			}
 			jda.shutdownNow();
+
+			jda = null;
 		}
 	}
 }
