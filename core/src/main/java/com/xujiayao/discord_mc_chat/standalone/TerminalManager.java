@@ -44,7 +44,7 @@ public class TerminalManager {
 					}
 				} catch (IllegalStateException e) {
 					// This can happen if System.in is closed externally, which signals the end.
-					LOGGER.warn("Terminal input stream closed. Shutting down terminal manager.", e);
+					LOGGER.warn(I18nManager.getDmccTranslation("terminal.input_closed"), e);
 					break;
 				}
 			}

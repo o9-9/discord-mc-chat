@@ -1,6 +1,7 @@
 package com.xujiayao.discord_mc_chat.server;
 
 import com.xujiayao.discord_mc_chat.server.discord.DiscordManager;
+import com.xujiayao.discord_mc_chat.utils.i18n.I18nManager;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,7 +38,7 @@ public class ServerDMCC {
 		try (ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "DMCC-Server"))) {
 			return executor.submit(() -> {
 				if (!DiscordManager.init()) {
-					LOGGER.error("Failed to initialize Discord Manager, aborting DMCC-Server startup");
+					LOGGER.error(I18nManager.getDmccTranslation("server.discord_init_failed"));
 					return -1;
 				}
 
@@ -47,7 +48,7 @@ public class ServerDMCC {
 				return port;
 			}).get();
 		} catch (Exception e) {
-			LOGGER.error("DMCC-Server startup was interrupted", e);
+			LOGGER.error(I18nManager.getDmccTranslation("server.startup_interrupted"), e);
 			return -1;
 		}
 	}

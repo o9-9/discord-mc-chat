@@ -38,7 +38,7 @@ public class DiscordManager {
 	public static boolean init() {
 		String token = ConfigManager.getString("discord.bot.token");
 		if (token.isBlank()) {
-			LOGGER.error("Discord bot token is not set in the config file!");
+			LOGGER.error(I18nManager.getDmccTranslation("discord.manager.token_missing"));
 			return false;
 		}
 
@@ -58,13 +58,13 @@ public class DiscordManager {
 					try {
 						jda.awaitReady();
 					} catch (InterruptedException e) {
-						LOGGER.error("Discord bot initialization was interrupted", e);
+						LOGGER.error(I18nManager.getDmccTranslation("discord.manager.init_interrupted"), e);
 					}
 				});
 
 				CompletableFuture<Void> checkFuture = CompletableFuture.runAsync(() -> {
 					if (!readyFuture.isDone()) {
-						LOGGER.warn("Waiting for JDA to be ready, this may take a while (maximum 1 minute)...");
+						LOGGER.warn(I18nManager.getDmccTranslation("discord.manager.waiting_ready"));
 					}
 				}, CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS, executor));
 
@@ -72,9 +72,9 @@ public class DiscordManager {
 				checkFuture.cancel(false);
 			}
 
-			LOGGER.info("Discord bot is ready. Logged in as tag: \"{}\"", jda.getSelfUser().getAsTag());
+			LOGGER.info(I18nManager.getDmccTranslation("discord.manager.ready", jda.getSelfUser().getAsTag()));
 		} catch (Exception e) {
-			LOGGER.error("Discord bot initialization was interrupted", e);
+			LOGGER.error(I18nManager.getDmccTranslation("discord.manager.init_interrupted"), e);
 		}
 
 		// Blocks until commands are updated
@@ -89,16 +89,16 @@ public class DiscordManager {
 			CompletableFuture<List<Command>> updateFuture = jda.updateCommands().addCommands(commands).submit();
 			CompletableFuture<Void> checkFuture = CompletableFuture.runAsync(() -> {
 				if (!updateFuture.isDone()) {
-					LOGGER.warn("Registering Discord DMCC commands, this may take a while (maximum 1 minute)...");
+					LOGGER.warn(I18nManager.getDmccTranslation("discord.manager.registering_commands"));
 				}
 			}, CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS, executor));
 			updateFuture.join();
 			checkFuture.cancel(false);
 
-			LOGGER.info("Discord DMCC commands registered successfully!");
+			LOGGER.info(I18nManager.getDmccTranslation("discord.manager.commands_success"));
 			return true;
 		} catch (Exception e) {
-			LOGGER.error("Failed to register Discord DMCC commands", e);
+			LOGGER.error(I18nManager.getDmccTranslation("discord.manager.commands_failed"), e);
 		}
 
 		return false;

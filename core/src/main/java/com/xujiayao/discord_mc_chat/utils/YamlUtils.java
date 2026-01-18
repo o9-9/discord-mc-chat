@@ -1,6 +1,7 @@
 package com.xujiayao.discord_mc_chat.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.xujiayao.discord_mc_chat.utils.i18n.I18nManager;
 
 import java.nio.file.Path;
 import java.util.HashSet;
@@ -34,7 +35,7 @@ public class YamlUtils {
 	public static boolean validate(JsonNode userConfig, JsonNode templateConfig, Path configPath, boolean errorOnUnmodified) {
 		// Check if config is identical to template (user made no changes)
 		if (errorOnUnmodified && userConfig.equals(templateConfig)) {
-			LOGGER.error("Configuration file has not been modified from default template");
+			LOGGER.error(I18nManager.getDmccTranslation("utils.yaml.unmodified"));
 			return false;
 		}
 
@@ -43,8 +44,8 @@ public class YamlUtils {
 		String templateVersion = templateConfig.path("version").asText();
 
 		if (!templateVersion.equals(configVersion)) {
-			LOGGER.error("Configuration version mismatch. Expected version: {}, Found version: {}", templateVersion, configVersion);
-			LOGGER.error("Please upgrade your configuration file on Discord-MC-Chat Docs");
+			LOGGER.error(I18nManager.getDmccTranslation("utils.yaml.version_mismatch", templateVersion, configVersion));
+			LOGGER.error(I18nManager.getDmccTranslation("utils.yaml.upgrade_prompt"));
 			return false;
 		}
 
@@ -55,13 +56,13 @@ public class YamlUtils {
 
 		if (!extraKeys.isEmpty() || !missingKeys.isEmpty()) {
 			if (!extraKeys.isEmpty()) {
-				LOGGER.warn("Your configuration file contains the following unrecognized keys:");
+				LOGGER.warn(I18nManager.getDmccTranslation("utils.yaml.unrecognized_keys"));
 				for (String key : extraKeys) {
 					LOGGER.warn("  - {}", key);
 				}
 			}
 			if (!missingKeys.isEmpty()) {
-				LOGGER.error("Your configuration file is missing the following required keys:");
+				LOGGER.error(I18nManager.getDmccTranslation("utils.yaml.missing_keys"));
 				for (String key : missingKeys) {
 					LOGGER.error("  - {}", key);
 				}
@@ -72,7 +73,7 @@ public class YamlUtils {
 		// Check all node types for all items recursively
 		Set<String> typeIssues = validateNodeTypes(templateConfig, userConfig, "");
 		if (!typeIssues.isEmpty()) {
-			LOGGER.error("Your configuration file has type mismatch issues:");
+			LOGGER.error(I18nManager.getDmccTranslation("utils.yaml.type_mismatch"));
 			for (String issue : typeIssues) {
 				LOGGER.error("  - {}", issue);
 			}
@@ -83,7 +84,7 @@ public class YamlUtils {
 		// This is to catch cases where the user leaves a key unchanged from the template
 		Set<String> unmodifiedKeys = findUnmodifiedKeys(userConfig, templateConfig);
 		if (!unmodifiedKeys.isEmpty()) {
-			LOGGER.error("The following configuration keys are still unchanged from the template:");
+			LOGGER.error(I18nManager.getDmccTranslation("utils.yaml.unchanged_keys"));
 			for (String key : unmodifiedKeys) {
 				LOGGER.error("  - {}", key);
 			}

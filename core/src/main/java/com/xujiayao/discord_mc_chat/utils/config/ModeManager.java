@@ -2,6 +2,7 @@ package com.xujiayao.discord_mc_chat.utils.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.xujiayao.discord_mc_chat.utils.YamlUtils;
+import com.xujiayao.discord_mc_chat.utils.i18n.I18nManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,7 +37,7 @@ public class ModeManager {
 	public static boolean load() {
 		if (!IS_MINECRAFT_ENV) {
 			mode = "standalone";
-			LOGGER.info("Operating mode set to \"{}\"", mode);
+			LOGGER.info(I18nManager.getDmccTranslation("utils.config.mode.set", mode));
 			return true;
 		}
 
@@ -46,9 +47,9 @@ public class ModeManager {
 
 			// If mode.yml does not exist, create it from the template
 			if (!Files.exists(MODE_FILE_PATH) || Files.size(MODE_FILE_PATH) == 0) {
-				LOGGER.warn("Mode configuration file not found or is empty");
-				LOGGER.warn("Creating a default one at \"{}\"", MODE_FILE_PATH);
-				LOGGER.warn("Please edit \"{}\" before reloading DMCC", MODE_FILE_PATH);
+				LOGGER.warn(I18nManager.getDmccTranslation("utils.config.mode.not_found"));
+				LOGGER.warn(I18nManager.getDmccTranslation("utils.config.mode.creating", MODE_FILE_PATH));
+				LOGGER.warn(I18nManager.getDmccTranslation("utils.config.mode.edit_prompt", MODE_FILE_PATH));
 
 				try (InputStream inputStream = ModeManager.class.getResourceAsStream(MODE_TEMPLATE_PATH)) {
 					if (inputStream == null) {
@@ -71,23 +72,23 @@ public class ModeManager {
 
 			// Validate the mode file
 			if (!YamlUtils.validate(userModeConfig, templateModeConfig, MODE_FILE_PATH, true)) {
-				LOGGER.error("Validation of mode.yml failed");
+				LOGGER.error(I18nManager.getDmccTranslation("utils.config.mode.validation_failed"));
 				return false;
 			}
 
 			String loadedMode = userModeConfig.path("mode").asText();
 
 			if (!"single_server".equals(loadedMode) && !"multi_server_client".equals(loadedMode)) {
-				LOGGER.error("Invalid mode \"{}\" selected in \"{}\".", loadedMode, MODE_FILE_PATH);
-				LOGGER.error("Available modes are: \"single_server\", \"multi_server_client\"");
+				LOGGER.error(I18nManager.getDmccTranslation("utils.config.mode.invalid_selection", loadedMode, MODE_FILE_PATH));
+				LOGGER.error(I18nManager.getDmccTranslation("utils.config.mode.available_modes"));
 				return false;
 			}
 
-			LOGGER.info("Operating mode set to \"{}\"", loadedMode);
+			LOGGER.info(I18nManager.getDmccTranslation("utils.config.mode.set", loadedMode));
 			mode = loadedMode;
 			return true;
 		} catch (IOException e) {
-			LOGGER.error("Failed to load or create mode.yml", e);
+			LOGGER.error(I18nManager.getDmccTranslation("utils.config.mode.load_failed"), e);
 			return false;
 		}
 	}

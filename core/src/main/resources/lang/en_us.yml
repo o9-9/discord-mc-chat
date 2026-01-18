@@ -11,6 +11,7 @@
 terminal:
   started: "Interactive terminal started. Type \"help\" for a list of available commands."
   unknown_command: "Unknown command: \"{}\". Type \"help\" for a list of available commands."
+  input_closed: "Terminal input stream closed. Shutting down terminal manager."
 
 commands:
   help:
@@ -26,3 +27,75 @@ commands:
     shutting_down: "Shutting down DMCC..."
     success: "DMCC shut down successfully. Goodbye!"
     failure: "DMCC shutdown failed."
+
+main:
+  init:
+    info_minecraft_env: "Initializing DMCC {} in a Minecraft environment."
+    info_standalone_env: "Initializing DMCC {} in a Standalone environment."
+    reload_prompt: "Please correct the errors mentioned above, then run \"/dmcc reload\"."
+    restart_prompt: "Please correct the errors mentioned above, then restart DMCC."
+    success: "DMCC initialized successfully!"
+    failed: "An error occurred during DMCC initialization."
+  shutdown:
+    okhttp_failed: "An error occurred during OkHttpClient shutdown."
+    success: "DMCC shut down successfully!"
+    failed: "An error occurred during DMCC shutdown."
+
+discord:
+  manager:
+    token_missing: "Discord bot token is not set in the config file!"
+    init_interrupted: "Discord bot initialization was interrupted."
+    waiting_ready: "Waiting for JDA to be ready. This may take a while... (should be within 1 minute)"
+    ready: "Discord bot is ready. Logged in as tag: \"{}\""
+    registering_commands: "Registering Discord DMCC commands. This may take a while... (should be within 1 minute)"
+    commands_success: "Discord DMCC commands registered successfully!"
+    commands_failed: "Failed to register Discord DMCC commands."
+
+server:
+  discord_init_failed: "Failed to initialize Discord Manager. Aborting DMCC-Server startup."
+  startup_interrupted: "DMCC-Server startup was interrupted."
+
+client:
+  startup_interrupted: "DMCC-Client startup was interrupted."
+
+utils:
+  config:
+    mode:
+      set: "Operating mode set to \"{}\"."
+      not_found: "Mode configuration file not found or is empty."
+      creating: "Creating a default one at \"{}\"."
+      edit_prompt: "Please edit \"{}\" before reloading DMCC."
+      validation_failed: "Validation of mode.yml failed."
+      invalid_selection: "Invalid mode \"{}\" selected in \"{}\"."
+      available_modes: "Available modes are: \"single_server\", \"multi_server_client\""
+      load_failed: "Failed to load or create mode.yml."
+    config:
+      not_found: "Configuration file not found or is empty."
+      creating: "Creating a default one at \"{}\"."
+      edit_prompt: "Please edit \"{}\" before reloading DMCC."
+      mode_mismatch: "Mode mismatch detected!"
+      mode_mismatch_detail: "The expected mode is \"{}\" (from mode.yml or environment), but config.yml is for \"{}\"."
+      backup_prompt: "Please backup and delete your existing config.yml to allow DMCC to generate a new and correct one."
+      validation_failed: "Validation of config.yml failed."
+      load_failed: "Failed to load or validate configuration."
+      path_not_found: "Configuration path not found: {}"
+  yaml:
+    unmodified: "Configuration file has not been modified from default template."
+    version_mismatch: "Configuration version mismatch. Expected version: {}, Found version: {}"
+    upgrade_prompt: "Please upgrade your configuration file on Discord-MC-Chat Docs."
+    unrecognized_keys: "Your configuration file contains the following unrecognized keys:"
+    missing_keys: "Your configuration file is missing the following required keys:"
+    type_mismatch: "Your configuration file has type mismatch issues:"
+    unchanged_keys: "The following configuration keys are still unchanged from the template:"
+  i18n:
+    language_not_supported: "Language \"{}\" is not supported."
+    contribute: "You are welcome to contribute translations to DMCC!"
+    contribute_link: "For more details, see: https://github.com/Xujiayao/Discord-MC-Chat#Contributing"
+    check_failed: "Failed to check language resources."
+    load_failed: "Failed to load DMCC translations from {}."
+    custom_not_found: "Custom messages file for \"{}\" not found or is empty."
+    custom_creating: "Creating a default one at \"{}\"."
+    using_default: "DMCC will continue using default values."
+    custom_edit_prompt: "If you wish to customize messages, please edit \"{}\" and reload DMCC."
+    custom_validation_failed: "Validation of custom message config failed."
+    custom_load_failed: "Failed to load custom messages."

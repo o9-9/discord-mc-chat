@@ -11,6 +11,7 @@
 terminal:
   started: "交互式终端已启动。输入 \"help\" 查看可用命令列表。"
   unknown_command: "未知命令：\"{}\"。输入 \"help\" 查看可用命令列表。"
+  input_closed: "终端输入流已关闭。正在关闭终端管理器。"
 
 commands:
   help:
@@ -26,3 +27,75 @@ commands:
     shutting_down: "正在关闭 DMCC..."
     success: "DMCC 关闭成功。再见！"
     failure: "DMCC 关闭失败。"
+
+main:
+  init:
+    info_minecraft_env: "正在 Minecraft 环境中初始化 DMCC {}。"
+    info_standalone_env: "正在独立环境中初始化 DMCC {}。"
+    reload_prompt: "请更正上述错误，然后运行 \"/dmcc reload\"。"
+    restart_prompt: "请更正上述错误，然后重新启动 DMCC。"
+    success: "DMCC 初始化成功！"
+    failed: "DMCC 初始化期间发生错误。"
+  shutdown:
+    okhttp_failed: "OkHttpClient 关闭期间发生错误。"
+    success: "DMCC 关闭成功！"
+    failed: "DMCC 关闭期间发生错误。"
+
+discord:
+  manager:
+    token_missing: "配置文件中未设置 Discord 机器人令牌！"
+    init_interrupted: "Discord 机器人初始化被中断。"
+    waiting_ready: "正在等待 JDA 就绪。这可能需要一段时间...（理应在 1 分钟以内）"
+    ready: "Discord 机器人已就绪。登录标签为：\"{}\""
+    registering_commands: "正在注册 Discord DMCC 命令。这可能需要一段时间...（理应在 1 分钟以内）"
+    commands_success: "Discord DMCC 命令注册成功！"
+    commands_failed: "注册 Discord DMCC 命令失败。"
+
+server:
+  discord_init_failed: "初始化 Discord Manager 失败。正在中止 DMCC-Server 启动。"
+  startup_interrupted: "DMCC-Server 启动被中断。"
+
+client:
+  startup_interrupted: "DMCC-Client 启动被中断。"
+
+utils:
+  config:
+    mode:
+      set: "运行模式已设置为 \"{}\"。"
+      not_found: "模式配置文件未找到或为空。"
+      creating: "正在于 \"{}\" 创建默认文件。"
+      edit_prompt: "请在重新加载 DMCC 之前编辑 \"{}\"。"
+      validation_failed: "mode.yml 验证失败。"
+      invalid_selection: "在 \"{1}\" 中选择了无效的模式 \"{0}\"。"
+      available_modes: "可用模式为：\"single_server\", \"multi_server_client\""
+      load_failed: "无法加载或创建 mode.yml。"
+    config:
+      not_found: "配置文件未找到或为空。"
+      creating: "正在于 \"{}\" 创建默认文件。"
+      edit_prompt: "请在重新加载 DMCC 之前编辑 \"{}\"。"
+      mode_mismatch: "检测到模式不匹配！"
+      mode_mismatch_detail: "期望的模式是 \"{}\"（来自 mode.yml 或环境），但 config.yml 是针对 \"{}\" 的。"
+      backup_prompt: "请备份并删除现有的 config.yml，以便 DMCC 生成新的正确文件。"
+      validation_failed: "config.yml 验证失败。"
+      load_failed: "无法加载或验证配置。"
+      path_not_found: "配置路径未找到：{}"
+  yaml:
+    unmodified: "配置文件未从默认模板修改。"
+    version_mismatch: "配置版本不匹配。期望版本：{}，发现版本：{}"
+    upgrade_prompt: "请在 Discord-MC-Chat 文档中升级你的配置文件。"
+    unrecognized_keys: "你的配置文件包含以下未识别的键："
+    missing_keys: "你的配置文件缺少以下必需的键："
+    type_mismatch: "你的配置文件存在类型不匹配问题："
+    unchanged_keys: "以下配置键仍未从模板更改："
+  i18n:
+    language_not_supported: "不支持语言 \"{}\"。"
+    contribute: "欢迎为 DMCC 贡献翻译！"
+    contribute_link: "详情请见：https://github.com/Xujiayao/Discord-MC-Chat#Contributing"
+    check_failed: "检查语言资源失败。"
+    load_failed: "无法从 {} 加载 DMCC 翻译。"
+    custom_not_found: "\"{}\" 的自定义消息文件未找到或为空。"
+    custom_creating: "正在于 \"{}\" 创建默认文件。"
+    using_default: "DMCC 将继续使用默认值。"
+    custom_edit_prompt: "如果你希望自定义消息，请编辑 \"{}\" 并重新加载 DMCC。"
+    custom_validation_failed: "自定义消息配置验证失败。"
+    custom_load_failed: "加载自定义消息失败。"

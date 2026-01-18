@@ -62,20 +62,24 @@ public class DMCC {
 				LOGGER.info("│ By Xujiayao                                          https://dmcc.xujiayao.com/ │");
 				LOGGER.info("└─────────────────────────────────────────────────────────────────────────────────┘");
 
-				LOGGER.info("Initializing DMCC {} with IS_MINECRAFT_ENV: {}", VERSION, IS_MINECRAFT_ENV);
+				// Load DMCC internal translation
+				if (!I18nManager.loadInternalTranslationsOnly()) {
+					// Should not happen!
+					LOGGER.warn("DMCC will not continue initialization due to internal language file issues.");
+					LOGGER.warn("This is a critical error, please report it to the developer!");
+					return false;
+				}
+
+				if (IS_MINECRAFT_ENV) {
+					LOGGER.info(I18nManager.getDmccTranslation("main.init.info_minecraft_env", VERSION));
+				} else {
+					LOGGER.info(I18nManager.getDmccTranslation("main.init.info_standalone_env", VERSION));
+				}
 
 				// If configuration fails to load, exit the DMCC-Init thread gracefully
 				// In a Minecraft environment, we just return and let the server continue running
 				// User can run the reload command after fixing the issues
 				// In standalone mode, the process will exit, user can restart DMCC after fixing the issues
-
-				// Load DMCC internal translation
-				if (!I18nManager.loadInternalTranslationsOnly()) {
-					// Should not happen!
-					LOGGER.warn("DMCC will not continue initialization due to internal language file issues");
-					LOGGER.warn("This is a critical error, please report it to the developer!");
-					return false;
-				}
 
 				boolean configs = !ModeManager.load() // Determine operating mode
 						|| !ConfigManager.load() // Load configuration
@@ -86,9 +90,9 @@ public class DMCC {
 
 				if (configs) {
 					if (IS_MINECRAFT_ENV) {
-						LOGGER.warn("Please correct the errors mentioned above, then run \"/dmcc reload\".");
+						LOGGER.warn(I18nManager.getDmccTranslation("main.init.reload_prompt"));
 					} else {
-						LOGGER.warn("Please correct the errors mentioned above, then restart DMCC.");
+						LOGGER.warn(I18nManager.getDmccTranslation("main.init.restart_prompt"));
 					}
 					return false;
 				}
@@ -126,11 +130,11 @@ public class DMCC {
 					}
 				}
 
-				LOGGER.info("DMCC initialized successfully!");
+				LOGGER.info(I18nManager.getDmccTranslation("main.init.success"));
 				return true;
 			}).get();
 		} catch (Exception e) {
-			LOGGER.error("An error occurred during DMCC initialization", e);
+			LOGGER.error(I18nManager.getDmccTranslation("main.init.failed"), e);
 			return false;
 		}
 	}
@@ -160,15 +164,15 @@ public class DMCC {
 
 					OK_HTTP_CLIENT.connectionPool().evictAll();
 				} catch (Exception e) {
-					LOGGER.error("An error occurred during OkHttpClient shutdown", e);
+					LOGGER.error(I18nManager.getDmccTranslation("main.shutdown.okhttp_failed"), e);
 					return false;
 				}
 
-				LOGGER.info("DMCC shut down successfully!");
+				LOGGER.info(I18nManager.getDmccTranslation("main.shutdown.success"));
 				return true;
 			}).get();
 		} catch (Exception e) {
-			LOGGER.error("An error occurred during DMCC shutdown", e);
+			LOGGER.error(I18nManager.getDmccTranslation("main.shutdown.failed"), e);
 			return false;
 		}
 	}

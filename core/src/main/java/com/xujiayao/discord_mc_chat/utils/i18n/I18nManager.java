@@ -94,13 +94,13 @@ public class I18nManager {
 			 InputStream dmccLangStream = I18nManager.class.getResourceAsStream("/lang/" + language + ".yml")) {
 
 			if (customMessagesStream == null || dmccLangStream == null) {
-				LOGGER.error("Language \"{}\" is not supported", language);
-				LOGGER.info("You are welcome to contribute translations to DMCC!");
-				LOGGER.info("For more details, see: https://github.com/Xujiayao/Discord-MC-Chat#Contributing");
+				LOGGER.error(I18nManager.getDmccTranslation("utils.i18n.language_not_supported", language));
+				LOGGER.info(I18nManager.getDmccTranslation("utils.i18n.contribute"));
+				LOGGER.info(I18nManager.getDmccTranslation("utils.i18n.contribute_link"));
 				return false;
 			}
 		} catch (IOException e) {
-			LOGGER.error("Failed to check language resources", e);
+			LOGGER.error(I18nManager.getDmccTranslation("utils.i18n.check_failed"), e);
 			return false;
 		}
 		return true;
@@ -119,7 +119,7 @@ public class I18nManager {
 			JsonNode rootNode = YAML_MAPPER.readTree(inputStream);
 			flattenJsonToMap(rootNode, "", DMCC_TRANSLATIONS);
 		} catch (IOException e) {
-			LOGGER.error("Failed to load DMCC translations from " + resourcePath, e);
+			LOGGER.error(I18nManager.getDmccTranslation("utils.i18n.load_failed", resourcePath), e);
 			return false;
 		}
 
@@ -145,10 +145,10 @@ public class I18nManager {
 					}
 					Files.copy(inputStream, customMessagesPath, StandardCopyOption.REPLACE_EXISTING);
 
-					LOGGER.warn("Custom messages file for \"{}\" not found or is empty", language);
-					LOGGER.warn("Creating a default one at \"{}\"", customMessagesPath);
-					LOGGER.warn("DMCC will continue using default values");
-					LOGGER.warn("If you wish to customize messages, please edit \"{}\" and reload DMCC.", customMessagesPath);
+					LOGGER.warn(I18nManager.getDmccTranslation("utils.i18n.custom_not_found", language));
+					LOGGER.warn(I18nManager.getDmccTranslation("utils.i18n.custom_creating", customMessagesPath));
+					LOGGER.warn(I18nManager.getDmccTranslation("utils.i18n.using_default"));
+					LOGGER.warn(I18nManager.getDmccTranslation("utils.i18n.custom_edit_prompt", customMessagesPath));
 				}
 			}
 
@@ -164,14 +164,14 @@ public class I18nManager {
 			// Validate the user's file against the template.
 			// The `errorOnUnmodified` flag is set to false because users might not need to customize messages.
 			if (!YamlUtils.validate(userMessages, templateMessages, customMessagesPath, false)) {
-				LOGGER.error("Validation of custom message config failed");
+				LOGGER.error(I18nManager.getDmccTranslation("utils.i18n.custom_validation_failed"));
 				return false;
 			}
 
 			customMessages = userMessages;
 			return true;
 		} catch (IOException e) {
-			LOGGER.error("Failed to load custom messages", e);
+			LOGGER.error(I18nManager.getDmccTranslation("utils.i18n.custom_load_failed"), e);
 		}
 
 		return false;

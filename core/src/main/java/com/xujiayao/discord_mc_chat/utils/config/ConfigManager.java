@@ -2,6 +2,7 @@ package com.xujiayao.discord_mc_chat.utils.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.xujiayao.discord_mc_chat.utils.YamlUtils;
+import com.xujiayao.discord_mc_chat.utils.i18n.I18nManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,9 +42,9 @@ public class ConfigManager {
 
 			// If config.yml does not exist or is empty, create it from the appropriate template.
 			if (!Files.exists(CONFIG_FILE_PATH) || Files.size(CONFIG_FILE_PATH) == 0) {
-				LOGGER.warn("Configuration file not found or is empty");
-				LOGGER.warn("Creating a default one at \"{}\"", CONFIG_FILE_PATH);
-				LOGGER.warn("Please edit \"{}\" before reloading DMCC", CONFIG_FILE_PATH);
+				LOGGER.warn(I18nManager.getDmccTranslation("utils.config.config.not_found"));
+				LOGGER.warn(I18nManager.getDmccTranslation("utils.config.config.creating", CONFIG_FILE_PATH));
+				LOGGER.warn(I18nManager.getDmccTranslation("utils.config.config.edit_prompt", CONFIG_FILE_PATH));
 
 				try (InputStream inputStream = ConfigManager.class.getResourceAsStream(configTemplatePath)) {
 					if (inputStream == null) {
@@ -63,9 +64,9 @@ public class ConfigManager {
 			// Check for mode consistency
 			String configMode = userConfig.path("mode").asText();
 			if (!expectedMode.equals(configMode)) {
-				LOGGER.error("Mode mismatch detected!");
-				LOGGER.error("The expected mode is \"{}\" (from mode.yml or environment), but config.yml is for \"{}\".", expectedMode, configMode);
-				LOGGER.error("Please backup and delete your existing config.yml to allow DMCC to generate a new and correct one.");
+				LOGGER.error(I18nManager.getDmccTranslation("utils.config.config.mode_mismatch"));
+				LOGGER.error(I18nManager.getDmccTranslation("utils.config.config.mode_mismatch_detail", expectedMode, configMode));
+				LOGGER.error(I18nManager.getDmccTranslation("utils.config.config.backup_prompt"));
 				return false;
 			}
 
@@ -80,14 +81,14 @@ public class ConfigManager {
 
 			// Validate config
 			if (!YamlUtils.validate(userConfig, templateConfig, CONFIG_FILE_PATH, true)) {
-				LOGGER.error("Validation of config.yml failed");
+				LOGGER.error(I18nManager.getDmccTranslation("utils.config.config.validation_failed"));
 				return false;
 			}
 
 			ConfigManager.config = userConfig;
 			return true;
 		} catch (IOException e) {
-			LOGGER.error("Failed to load or validate configuration", e);
+			LOGGER.error(I18nManager.getDmccTranslation("utils.config.config.load_failed"), e);
 			return false;
 		}
 	}
@@ -110,7 +111,7 @@ public class ConfigManager {
 
 		for (String part : parts) {
 			if (node == null || node.isMissingNode() || node.isNull()) {
-				LOGGER.warn("Configuration path not found: {}", path);
+				LOGGER.warn(I18nManager.getDmccTranslation("utils.config.config.path_not_found", path));
 				return node;
 			}
 			node = node.path(part);

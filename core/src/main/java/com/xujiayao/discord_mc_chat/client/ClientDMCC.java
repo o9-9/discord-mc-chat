@@ -1,5 +1,7 @@
 package com.xujiayao.discord_mc_chat.client;
 
+import com.xujiayao.discord_mc_chat.utils.i18n.I18nManager;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,7 +30,7 @@ public class ClientDMCC {
 				return nettyClient.start();
 			}).get();
 		} catch (Exception e) {
-			LOGGER.error("DMCC-Client startup was interrupted", e);
+			LOGGER.error(I18nManager.getDmccTranslation("client.startup_interrupted"), e);
 			return false;
 		}
 	}
