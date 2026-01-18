@@ -52,7 +52,25 @@ public class DiscordManager {
 					.addEventListeners(new DiscordEventHandler())
 					.build();
 
-			jda.awaitReady();
+			// Blocks until JDA is ready
+			try (ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "DMCC-FutureChecker"))) {
+				CompletableFuture<Void> readyFuture = CompletableFuture.runAsync(() -> {
+					try {
+						jda.awaitReady();
+					} catch (InterruptedException e) {
+						LOGGER.error("Discord bot initialization was interrupted", e);
+					}
+				});
+
+				CompletableFuture<Void> checkFuture = CompletableFuture.runAsync(() -> {
+					if (!readyFuture.isDone()) {
+						LOGGER.warn("Waiting for JDA to be ready, this may take a while (maximum 1 minute)...");
+					}
+				}, CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS, executor));
+
+				readyFuture.join();
+				checkFuture.cancel(false);
+			}
 
 			LOGGER.info("Discord bot is ready. Logged in as tag: \"{}\"", jda.getSelfUser().getAsTag());
 		} catch (Exception e) {
@@ -71,7 +89,7 @@ public class DiscordManager {
 			CompletableFuture<List<Command>> updateFuture = jda.updateCommands().addCommands(commands).submit();
 			CompletableFuture<Void> checkFuture = CompletableFuture.runAsync(() -> {
 				if (!updateFuture.isDone()) {
-					LOGGER.warn("Registering Discord DMCC commands, this may take a while (around 1 minute)...");
+					LOGGER.warn("Registering Discord DMCC commands, this may take a while (maximum 1 minute)...");
 				}
 			}, CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS, executor));
 			updateFuture.join();
