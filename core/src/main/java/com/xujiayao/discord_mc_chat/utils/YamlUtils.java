@@ -56,9 +56,9 @@ public class YamlUtils {
 
 		if (!extraKeys.isEmpty() || !missingKeys.isEmpty()) {
 			if (!extraKeys.isEmpty()) {
-				LOGGER.warn(I18nManager.getDmccTranslation("utils.yaml.unrecognized_keys"));
+				LOGGER.error(I18nManager.getDmccTranslation("utils.yaml.unrecognized_keys"));
 				for (String key : extraKeys) {
-					LOGGER.warn("  - {}", key);
+					LOGGER.error("  - {}", key);
 				}
 			}
 			if (!missingKeys.isEmpty()) {
