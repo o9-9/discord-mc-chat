@@ -81,7 +81,7 @@ public class DMCC {
 
 				boolean configs = !ModeManager.load() // Determine operating mode
 						|| !ConfigManager.load() // Load configuration
-						|| !I18nManager.load(ConfigManager.getString("language", "en_us")); // Load all translations
+						|| !I18nManager.load(ConfigManager.getString("language", I18nManager.detectLanguage())); // Load all translations
 
 				// Initialize command system after internal translations and operating mode are loaded
 				CommandManager.initialize();
