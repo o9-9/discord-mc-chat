@@ -3,10 +3,8 @@ package com.xujiayao.discord_mc_chat;
 import com.xujiayao.discord_mc_chat.client.ClientDMCC;
 import com.xujiayao.discord_mc_chat.commands.CommandManager;
 import com.xujiayao.discord_mc_chat.server.ServerDMCC;
-import com.xujiayao.discord_mc_chat.utils.ExecutorServiceUtils;
 import com.xujiayao.discord_mc_chat.utils.config.ConfigManager;
 import com.xujiayao.discord_mc_chat.utils.config.ModeManager;
-import com.xujiayao.discord_mc_chat.utils.events.EventManager;
 import com.xujiayao.discord_mc_chat.utils.i18n.I18nManager;
 import okhttp3.Cache;
 
@@ -154,13 +152,15 @@ public class DMCC {
 					serverInstance.shutdown();
 				}
 
-				// Clear all event handlers
-				EventManager.clear();
+				// Do NOT clear event handlers here. They are registered once during mod initialization
+				// and should persist across DMCC reloads.
+				// EventManager.clear();
 
 				// Shutdown OkHttpClient
-				try (ExecutorService ok_http_executor = OK_HTTP_CLIENT.dispatcher().executorService();
-					 Cache ignored = OK_HTTP_CLIENT.cache()) {
-					ExecutorServiceUtils.shutdownAnExecutor(ok_http_executor);
+				try (Cache ignored = OK_HTTP_CLIENT.cache()) {
+					// OK_HTTP_CLIENT is static final. We should NOT shut down its dispatcher executor
+					// because it would prevent the client from being reused after a reload.
+					// ExecutorServiceUtils.shutdownAnExecutor(ok_http_executor);
 
 					OK_HTTP_CLIENT.connectionPool().evictAll();
 				} catch (Exception e) {
