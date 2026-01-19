@@ -30,6 +30,10 @@ commands:
 
 main:
   init:
+    headless:
+      detected: "No console detected, indicating DMCC is running in headless mode."
+      not_supported: "DMCC does not support being started by double-clicking the JAR file."
+      usage: "Please start DMCC from the command line \"java -jar Discord-MC-Chat-{}.jar\"."
     info_minecraft_env: "Initializing DMCC in a Minecraft environment..."
     info_standalone_env: "Initializing DMCC in a Standalone environment..."
     minecraft_reload_prompt: "Please correct the errors mentioned above, then run \"/dmcc reload\"."

@@ -30,6 +30,10 @@ commands:
 
 main:
   init:
+    headless:
+      detected: "未检测到控制台，这表明 DMCC 正在无头模式下运行。"
+      not_supported: "DMCC 不支持通过双击 JAR 文件启动。"
+      usage: "请通过命令行启动 DMCC：\"java -jar Discord-MC-Chat-{}.jar\"。"
     info_minecraft_env: "正在 Minecraft 环境中初始化 DMCC..."
     info_standalone_env: "正在独立环境中初始化 DMCC..."
     minecraft_reload_prompt: "请更正上述错误，然后运行 \"/dmcc reload\"。"

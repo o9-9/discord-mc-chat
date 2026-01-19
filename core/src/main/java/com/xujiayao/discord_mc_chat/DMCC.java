@@ -34,13 +34,21 @@ public class DMCC {
 	public static boolean init() {
 		try (ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "DMCC-Init"))) {
 			return executor.submit(() -> {
+				// Load DMCC internal translation
+				if (!I18nManager.loadInternalTranslationsOnly()) {
+					// Should not happen!
+					LOGGER.warn("DMCC will not continue initialization due to internal language file issues.");
+					LOGGER.warn("This is a critical error, please report it to the developer!");
+					return false;
+				}
+
 				// Check if running in headless mode
 				if (System.console() == null && !IS_MINECRAFT_ENV) {
 					// The user likely started the application by double-clicking the JAR file in a GUI environment
 					// Generates a warning to remind the user to start DMCC from the command line
-					LOGGER.warn("No console detected, indicating DMCC is running in headless mode");
-					LOGGER.warn("DMCC does not support being started by double-clicking the JAR file");
-					LOGGER.warn("Please start DMCC from the command line \"java -jar Discord-MC-Chat-{}.jar\"", VERSION);
+					LOGGER.warn(I18nManager.getDmccTranslation("main.init.headless.detected"));
+					LOGGER.warn(I18nManager.getDmccTranslation("main.init.headless.not_supported"));
+					LOGGER.warn(I18nManager.getDmccTranslation("main.init.headless.usage", VERSION));
 
 					return false;
 				}
@@ -59,14 +67,6 @@ public class DMCC {
 				LOGGER.info("│ Discord-MC-Chat (DMCC) {} Discord-MC-Chat Docs: │", versionString);
 				LOGGER.info("│ By Xujiayao                                          https://dmcc.xujiayao.com/ │");
 				LOGGER.info("└─────────────────────────────────────────────────────────────────────────────────┘");
-
-				// Load DMCC internal translation
-				if (!I18nManager.loadInternalTranslationsOnly()) {
-					// Should not happen!
-					LOGGER.warn("DMCC will not continue initialization due to internal language file issues.");
-					LOGGER.warn("This is a critical error, please report it to the developer!");
-					return false;
-				}
 
 				if (IS_MINECRAFT_ENV) {
 					LOGGER.info(I18nManager.getDmccTranslation("main.init.info_minecraft_env"));
