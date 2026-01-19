@@ -152,6 +152,8 @@ public class DMCC {
 					serverInstance.shutdown();
 				}
 
+				CommandManager.shutdown();
+
 				// Do NOT clear event handlers here. They are registered once during mod initialization
 				// and should persist across DMCC reloads.
 				// EventManager.clear();

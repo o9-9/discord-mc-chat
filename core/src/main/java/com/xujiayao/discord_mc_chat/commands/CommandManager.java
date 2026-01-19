@@ -22,12 +22,16 @@ import java.util.concurrent.Executors;
 public class CommandManager {
 
 	private static final Map<String, Command> COMMANDS = new ConcurrentHashMap<>();
-	private static final ExecutorService COMMAND_EXECUTOR = Executors.newSingleThreadExecutor(ExecutorServiceUtils.newThreadFactory("DMCC-Command"));
+	private static ExecutorService commandExecutor;
 
 	/**
 	 * Initialize and register built-in commands based on the current operating mode.
 	 */
 	public static void initialize() {
+		if (commandExecutor == null || commandExecutor.isShutdown()) {
+			commandExecutor = Executors.newSingleThreadExecutor(ExecutorServiceUtils.newThreadFactory("DMCC-Command"));
+		}
+
 		COMMANDS.clear();
 
 		register(new HelpCommand());
@@ -35,6 +39,16 @@ public class CommandManager {
 
 		if ("standalone".equals(ModeManager.getMode())) {
 			register(new ShutdownCommand());
+		}
+	}
+
+	/**
+	 * Shutdown the command executor.
+	 */
+	public static void shutdown() {
+		if (commandExecutor != null) {
+			commandExecutor.shutdown();
+			commandExecutor = null;
 		}
 	}
 
@@ -63,7 +77,11 @@ public class CommandManager {
 	 * @param rawInput The raw command line
 	 */
 	public static void execute(CommandSender sender, String rawInput) {
-		COMMAND_EXECUTOR.submit(() -> {
+		if (commandExecutor == null || commandExecutor.isShutdown()) {
+			return;
+		}
+
+		commandExecutor.submit(() -> {
 			String line = rawInput == null ? "" : rawInput.trim();
 			if (line.isEmpty()) {
 				sender.reply(I18nManager.getDmccTranslation("terminal.unknown_command", rawInput));
