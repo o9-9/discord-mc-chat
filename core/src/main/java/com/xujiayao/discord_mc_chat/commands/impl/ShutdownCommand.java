@@ -32,22 +32,19 @@ public class ShutdownCommand implements Command {
 
 	@Override
 	public void execute(CommandSender sender, String... args) {
-		Thread thread = new Thread(() -> {
-			sender.reply(I18nManager.getDmccTranslation("commands.shutdown.shutting_down"));
+		sender.reply(I18nManager.getDmccTranslation("commands.shutdown.shutting_down"));
 
-			if (DMCC.shutdown()) {
-				sender.reply(I18nManager.getDmccTranslation("commands.shutdown.success"));
+		if (DMCC.shutdown()) {
+			sender.reply(I18nManager.getDmccTranslation("commands.shutdown.success"));
 
-				Runtime.getRuntime().removeShutdownHook(SHUTDOWN_THREAD);
+			Runtime.getRuntime().removeShutdownHook(SHUTDOWN_THREAD);
 
-				// Logger cleanup
-				LoggerImpl.shutdown();
+			// Logger cleanup
+			LoggerImpl.shutdown();
 
-				System.exit(0);
-			} else {
-				sender.reply(I18nManager.getDmccTranslation("commands.shutdown.failure"));
-			}
-		}, "DMCC-ShutdownCommand");
-		thread.start();
+			System.exit(0);
+		} else {
+			sender.reply(I18nManager.getDmccTranslation("commands.shutdown.failure"));
+		}
 	}
 }
