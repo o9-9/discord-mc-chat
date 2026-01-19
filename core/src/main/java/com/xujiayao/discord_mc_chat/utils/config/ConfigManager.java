@@ -1,6 +1,7 @@
 package com.xujiayao.discord_mc_chat.utils.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.xujiayao.discord_mc_chat.utils.StringUtils;
 import com.xujiayao.discord_mc_chat.utils.YamlUtils;
 import com.xujiayao.discord_mc_chat.utils.i18n.I18nManager;
 
@@ -10,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.function.Function;
 
 import static com.xujiayao.discord_mc_chat.Constants.LOGGER;
@@ -43,16 +43,24 @@ public class ConfigManager {
 			// If config.yml does not exist or is empty, create it from the appropriate template.
 			if (!Files.exists(CONFIG_FILE_PATH) || Files.size(CONFIG_FILE_PATH) == 0) {
 				LOGGER.warn(I18nManager.getDmccTranslation("utils.config.config.not_found"));
-				LOGGER.warn(I18nManager.getDmccTranslation("utils.config.config.creating", CONFIG_FILE_PATH));
-				LOGGER.warn(I18nManager.getDmccTranslation("utils.config.config.edit_prompt", CONFIG_FILE_PATH));
+				LOGGER.info(I18nManager.getDmccTranslation("utils.config.config.creating", CONFIG_FILE_PATH));
+				LOGGER.info(I18nManager.getDmccTranslation("utils.config.config.replacing_lang", I18nManager.getLanguage()));
+				LOGGER.info(I18nManager.getDmccTranslation("utils.config.config.edit_prompt", CONFIG_FILE_PATH));
 
 				try (InputStream inputStream = ConfigManager.class.getResourceAsStream(configTemplatePath)) {
 					if (inputStream == null) {
 						throw new IOException("Default config template not found: " + configTemplatePath);
 					}
 
-					// Copy the template config file as is
-					Files.copy(inputStream, CONFIG_FILE_PATH, StandardCopyOption.REPLACE_EXISTING);
+					// Read the template content
+					String template = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+
+					// Replace the default language with the detected system language.
+					// This ensures the generated config file uses the user's system language if supported.
+					template = template.replace("\nlanguage: \"to_be_auto_replaced\"\n", StringUtils.format("\nlanguage: \"{}\"\n", I18nManager.getLanguage()));
+
+					// Write the config file with the replaced language setting
+					Files.writeString(CONFIG_FILE_PATH, template, StandardCharsets.UTF_8);
 				}
 
 				return false;

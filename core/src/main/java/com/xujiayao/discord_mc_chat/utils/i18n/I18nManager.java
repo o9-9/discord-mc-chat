@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import static com.xujiayao.discord_mc_chat.Constants.LOGGER;
@@ -30,8 +31,33 @@ public class I18nManager {
 	private static final Path CUSTOM_MESSAGES_DIR = Paths.get("./config/discord_mc_chat/custom_messages");
 	private static final Path CACHE_DIR = Paths.get("./config/discord_mc_chat/cache/lang");
 	private static final Map<String, String> minecraftTranslations = new HashMap<>();
-	private static String language = "en_us";
+	private static String language = detectLanguage();
 	private static JsonNode customMessages;
+
+	/**
+	 * Gets the currently selected language code.
+	 *
+	 * @return The language code (e.g., "en_us").
+	 */
+	public static String getLanguage() {
+		return language;
+	}
+
+	/**
+	 * Detects the system language and checks if it is supported by DMCC.
+	 *
+	 * @return The detected language code (e.g., "zh_cn") if supported, otherwise "en_us".
+	 */
+	public static String detectLanguage() {
+		String code = Locale.getDefault().toString().toLowerCase();
+
+		// Check if the internal translation file exists for the detected language
+		if (I18nManager.class.getResource("/lang/" + code + ".yml") != null) {
+			return code;
+		}
+
+		return "en_us";
+	}
 
 	/**
 	 * Loads only DMCC's internal translations from resources.

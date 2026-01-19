@@ -75,6 +75,7 @@ utils:
     config:
       not_found: "配置文件未找到或为空。"
       creating: "正在于 \"{}\" 创建默认文件。"
+      replacing_lang: "正在将配置文件中的语言设置替换为 \"{}\"。"
       edit_prompt: "请在重新加载 DMCC 之前编辑 \"{}\"。"
       mode_mismatch: "检测到模式不匹配。"
       mode_mismatch_detail: "期望的模式是 \"{}\"（来自 mode.yml 或环境），但 config.yml 是针对 \"{}\" 的。"

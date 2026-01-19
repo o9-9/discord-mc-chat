@@ -12,7 +12,7 @@ mode: single_server
 # ==================================================
 
 # 语言设置
-language: "en_us"
+language: "to_be_auto_replaced"
 
 # Discord 设置
 discord:
