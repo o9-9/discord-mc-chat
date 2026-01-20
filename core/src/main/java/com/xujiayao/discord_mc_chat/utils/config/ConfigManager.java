@@ -57,7 +57,7 @@ public class ConfigManager {
 
 					// Replace the default language with the detected system language.
 					// This ensures the generated config file uses the user's system language if supported.
-					template = template.replace("\nlanguage: \"to_be_auto_replaced\"\n", StringUtils.format("\nlanguage: \"{}\"\n", I18nManager.getLanguage()));
+					template = template.replace("language: \"to_be_auto_replaced\"", StringUtils.format("language: \"{}\"", I18nManager.getLanguage()));
 
 					// Write the config file with the replaced language setting
 					Files.writeString(CONFIG_FILE_PATH, template, StandardCharsets.UTF_8);
