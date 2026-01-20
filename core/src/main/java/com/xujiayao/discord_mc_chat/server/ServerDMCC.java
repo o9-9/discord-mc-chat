@@ -16,17 +16,14 @@ import static com.xujiayao.discord_mc_chat.Constants.LOGGER;
 public class ServerDMCC {
 
 	private final String host;
+	private final String sharedSecret;
 	private NettyServer nettyServer;
 	private int port;
 
-	public ServerDMCC(String host, int port) {
+	public ServerDMCC(String host, int port, String sharedSecret) {
 		this.host = host;
 		this.port = port;
-	}
-
-	public ServerDMCC(String host) {
-		this.host = host;
-		this.port = 0;
+		this.sharedSecret = sharedSecret;
 	}
 
 	/**
@@ -42,7 +39,7 @@ public class ServerDMCC {
 					return -1;
 				}
 
-				nettyServer = new NettyServer(host, port);
+				nettyServer = new NettyServer(host, port, sharedSecret);
 				port = nettyServer.start();
 
 				return port;

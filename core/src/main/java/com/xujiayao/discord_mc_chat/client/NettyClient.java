@@ -1,5 +1,29 @@
 package com.xujiayao.discord_mc_chat.client;
 
+import com.xujiayao.discord_mc_chat.network.serialization.JavaSerializerDecoder;
+import com.xujiayao.discord_mc_chat.network.serialization.JavaSerializerEncoder;
+import com.xujiayao.discord_mc_chat.utils.ExecutorServiceUtils;
+import com.xujiayao.discord_mc_chat.utils.i18n.I18nManager;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.nio.NioIoHandler;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.timeout.IdleStateHandler;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.xujiayao.discord_mc_chat.Constants.LOGGER;
+
 /**
  * Encapsulates the Netty client, connection, and reconnection logic.
  *
@@ -9,16 +33,110 @@ public class NettyClient {
 
 	private final String host;
 	private final int port;
+	private final String serverName;
+	private final String sharedSecret;
+	private EventLoopGroup workerGroup;
+	private CompletableFuture<Boolean> initialLoginFuture;
 
-	public NettyClient(String host, int port) {
+	// Reconnection settings
+	private final AtomicBoolean isRunning = new AtomicBoolean(false);
+	private final AtomicInteger reconnectDelay = new AtomicInteger(2); // Initial delay seconds
+	private static final int MAX_RECONNECT_DELAY = 512;
+
+	public NettyClient(String host, int port, String serverName, String sharedSecret) {
 		this.host = host;
 		this.port = port;
+		this.serverName = serverName;
+		this.sharedSecret = sharedSecret;
+	}
+	
+	public String getServerName() {
+		return serverName;
+	}
+	
+	public String getSharedSecret() {
+		return sharedSecret;
 	}
 
 	public boolean start() {
-		return true;
+		isRunning.set(true);
+		initialLoginFuture = new CompletableFuture<>();
+		
+		// Use MultiThreadIoEventLoopGroup with NioIoHandler
+		workerGroup = new MultiThreadIoEventLoopGroup(0, 
+				ExecutorServiceUtils.newThreadFactory("DMCC-NettyClient"),
+				NioIoHandler.newFactory());
+
+		connect(true);
+
+		try {
+			// Wait for the INITIAL handshake to complete
+			return initialLoginFuture.get(10, TimeUnit.SECONDS);
+		} catch (Exception e) {
+			LOGGER.error(I18nManager.getDmccTranslation("network.client.connect_failed"), e);
+			stop();
+			return false;
+		}
+	}
+
+	private void connect(boolean isInitialAttempt) {
+		if (!isRunning.get()) return;
+
+		Bootstrap b = new Bootstrap();
+		b.group(workerGroup);
+		b.channel(NioSocketChannel.class);
+		b.option(ChannelOption.SO_KEEPALIVE, true);
+		b.handler(new ChannelInitializer<SocketChannel>() {
+			@Override
+			public void initChannel(SocketChannel ch) {
+				ch.pipeline().addLast(
+						new IdleStateHandler(30, 15, 0),
+						new LengthFieldBasedFrameDecoder(1048576, 0, 4, 0, 4),
+						new LengthFieldPrepender(4),
+						new JavaSerializerDecoder(),
+						new JavaSerializerEncoder(),
+						new ClientHandler(NettyClient.this, initialLoginFuture)
+				);
+			}
+		});
+
+		if (isInitialAttempt) {
+			LOGGER.info(I18nManager.getDmccTranslation("network.client.connecting", host, port));
+		}
+
+		b.connect(host, port).addListener((ChannelFuture future) -> {
+			if (future.isSuccess()) {
+				// Connection established
+				reconnectDelay.set(2); // Reset delay on success
+			} else {
+				if (isInitialAttempt) {
+					initialLoginFuture.completeExceptionally(future.cause());
+				} else {
+					LOGGER.warn(I18nManager.getDmccTranslation("network.client.reconnect_failed", reconnectDelay.get()));
+					scheduleReconnect();
+				}
+			}
+		});
+	}
+
+	public void scheduleReconnect() {
+		if (!isRunning.get()) return;
+
+		int delay = reconnectDelay.get();
+		workerGroup.schedule(() -> connect(false), delay, TimeUnit.SECONDS);
+
+		// Exponential backoff with cap
+		reconnectDelay.set(Math.min(delay * 2, MAX_RECONNECT_DELAY));
 	}
 
 	public void stop() {
+		isRunning.set(false);
+		if (workerGroup != null) {
+			workerGroup.shutdownGracefully();
+		}
+	}
+	
+	public boolean isRunning() {
+		return isRunning.get();
 	}
 }

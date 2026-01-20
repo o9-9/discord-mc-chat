@@ -3,6 +3,7 @@ package com.xujiayao.discord_mc_chat;
 import com.xujiayao.discord_mc_chat.client.ClientDMCC;
 import com.xujiayao.discord_mc_chat.commands.CommandManager;
 import com.xujiayao.discord_mc_chat.server.ServerDMCC;
+import com.xujiayao.discord_mc_chat.utils.CryptUtils;
 import com.xujiayao.discord_mc_chat.utils.config.ConfigManager;
 import com.xujiayao.discord_mc_chat.utils.config.ModeManager;
 import com.xujiayao.discord_mc_chat.utils.i18n.I18nManager;
@@ -98,13 +99,19 @@ public class DMCC {
 				// From now on should separate ServerDMCC and ClientDMCC initialization based on mode
 				switch (ModeManager.getMode()) {
 					case "single_server" -> {
-						serverInstance = new ServerDMCC("127.0.0.1"); // Bind to a random port
+						// Generate ephemeral credentials for internal loopback connection
+						String internalServerName = "Internal";
+						String internalSharedSecret = CryptUtils.generateRandomString(32);
+						
+						// Server instance gets the secret to verify the client
+						serverInstance = new ServerDMCC("127.0.0.1", 0, internalSharedSecret); 
 						int port = serverInstance.start();
 
 						if (port == -1) {
 							return false;
 						} else {
-							clientInstance = new ClientDMCC("127.0.0.1", port);
+							// Client instance gets the same secret to authenticate
+							clientInstance = new ClientDMCC("127.0.0.1", port, internalServerName, internalSharedSecret);
 							if (!clientInstance.start()) {
 								return false;
 							}
@@ -113,7 +120,10 @@ public class DMCC {
 					case "multi_server_client" -> {
 						String host = ConfigManager.getString("multi_server.connection.host");
 						int port = ConfigManager.getInt("multi_server.connection.port");
-						clientInstance = new ClientDMCC(host, port);
+						String name = ConfigManager.getString("multi_server.server_name");
+						String secret = ConfigManager.getString("multi_server.connection.shared_secret");
+						
+						clientInstance = new ClientDMCC(host, port, name, secret);
 						if (!clientInstance.start()) {
 							return false;
 						}
@@ -121,7 +131,9 @@ public class DMCC {
 					case "standalone" -> {
 						String host = ConfigManager.getString("multi_server.connection.host");
 						int port = ConfigManager.getInt("multi_server.connection.port");
-						serverInstance = new ServerDMCC(host, port);
+						String secret = ConfigManager.getString("multi_server.connection.shared_secret");
+						
+						serverInstance = new ServerDMCC(host, port, secret);
 						if (serverInstance.start() == -1) {
 							return false;
 						}

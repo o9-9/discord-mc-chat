@@ -65,6 +65,30 @@ server:
 client:
   startup_interrupted: "DMCC 客户端启动被中断。"
 
+network:
+  client:
+    connecting: "正在连接至 DMCC Server {}:{}。"
+    connected: "已连接至 DMCC Server！"
+    connect_failed: "无法连接至 DMCC Server。"
+    disconnected_generic: "已与服务器断开连接。"
+    disconnected_reason: "已与服务器断开连接：{}。"
+    reconnecting: "正在重新连接至服务器..."
+    reconnect_failed: "重连失败。将在 {} 秒后重试。"
+  server:
+    listening: "DMCC Server 正在监听端口 {}。"
+    bind_failed: "无法绑定端口 {}。"
+    auth_success: "客户端验证成功：{}。"
+    auth_failed: "客户端验证失败：{}。"
+    whitelist_refused: "服务器名称 \"{}\" 不在白名单中。"
+    version_mismatch: "版本不匹配。客户端：{}，服务端：{}。"
+    client_disconnected_normal: "客户端已断开连接：{}。"
+    client_timeout: "客户端超时：{}。"
+  disconnect:
+    not_whitelisted: "服务器名称 \"{}\" 不在白名单中。"
+    version_mismatch: "版本不匹配。客户端：{}，服务端：{}。"
+    auth_failed: "验证失败。请检查 shared_secret。"
+    not_authenticated: "未通过验证。"
+
 utils:
   config:
     mode:

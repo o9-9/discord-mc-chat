@@ -65,6 +65,30 @@ server:
 client:
   startup_interrupted: "DMCC Client startup was interrupted."
 
+network:
+  client:
+    connecting: "Connecting to DMCC Server at {}:{}."
+    connected: "Connected to DMCC Server!"
+    connect_failed: "Failed to connect to DMCC Server."
+    disconnected_generic: "Disconnected from server."
+    disconnected_reason: "Disconnected from server: {}."
+    reconnecting: "Reconnecting to server..."
+    reconnect_failed: "Reconnection failed. Retrying in {} seconds."
+  server:
+    listening: "DMCC Server listening on port {}."
+    bind_failed: "Failed to bind to port {}."
+    auth_success: "Client authenticated: {}."
+    auth_failed: "Client authentication failed: {}."
+    whitelist_refused: "Server name \"{}\" is not whitelisted."
+    version_mismatch: "Version mismatch. Client: {}, Server: {}."
+    client_disconnected_normal: "Client disconnected: {}."
+    client_timeout: "Client timed out: {}."
+  disconnect:
+    not_whitelisted: "Server name \"{}\" is not whitelisted."
+    version_mismatch: "Version mismatch. Client: {}, Server: {}."
+    auth_failed: "Authentication failed. Please check shared_secret."
+    not_authenticated: "Not authenticated."
+
 utils:
   config:
     mode:

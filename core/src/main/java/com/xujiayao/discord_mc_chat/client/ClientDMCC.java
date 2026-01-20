@@ -16,17 +16,21 @@ public class ClientDMCC {
 
 	private final String host;
 	private final int port;
+	private final String serverName;
+	private final String sharedSecret;
 	private NettyClient nettyClient;
 
-	public ClientDMCC(String host, int port) {
+	public ClientDMCC(String host, int port, String serverName, String sharedSecret) {
 		this.host = host;
 		this.port = port;
+		this.serverName = serverName;
+		this.sharedSecret = sharedSecret;
 	}
 
 	public boolean start() {
-		try (ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "DMCC-Server"))) {
+		try (ExecutorService executor = Executors.newSingleThreadExecutor(r -> new Thread(r, "DMCC-Client"))) {
 			return executor.submit(() -> {
-				nettyClient = new NettyClient(host, port);
+				nettyClient = new NettyClient(host, port, serverName, sharedSecret);
 				return nettyClient.start();
 			}).get();
 		} catch (Exception e) {
