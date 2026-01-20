@@ -44,7 +44,6 @@ public class ConfigManager {
 			if (!Files.exists(CONFIG_FILE_PATH) || Files.size(CONFIG_FILE_PATH) == 0) {
 				LOGGER.warn(I18nManager.getDmccTranslation("utils.config.config.not_found"));
 				LOGGER.info(I18nManager.getDmccTranslation("utils.config.config.creating", CONFIG_FILE_PATH));
-				LOGGER.info(I18nManager.getDmccTranslation("utils.config.config.replacing_lang", I18nManager.getLanguage()));
 				LOGGER.info(I18nManager.getDmccTranslation("utils.config.config.edit_prompt", CONFIG_FILE_PATH));
 
 				try (InputStream inputStream = ConfigManager.class.getResourceAsStream(configTemplatePath)) {

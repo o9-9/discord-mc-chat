@@ -79,7 +79,6 @@ utils:
     config:
       not_found: "Configuration file not found or is empty."
       creating: "Creating a default one at \"{}\"."
-      replacing_lang: "Replacing language setting in config file to \"{}\"."
       edit_prompt: "Please edit \"{}\" before reloading DMCC."
       mode_mismatch: "Mode mismatch detected."
       mode_mismatch_detail: "The expected mode is \"{}\" (from mode.yml or environment), but config.yml is for \"{}\"."
