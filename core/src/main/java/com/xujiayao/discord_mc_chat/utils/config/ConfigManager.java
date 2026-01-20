@@ -1,6 +1,7 @@
 package com.xujiayao.discord_mc_chat.utils.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.xujiayao.discord_mc_chat.utils.CryptUtils;
 import com.xujiayao.discord_mc_chat.utils.StringUtils;
 import com.xujiayao.discord_mc_chat.utils.YamlUtils;
 import com.xujiayao.discord_mc_chat.utils.i18n.I18nManager;
@@ -11,8 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.function.Function;
 
 import static com.xujiayao.discord_mc_chat.Constants.LOGGER;
@@ -62,7 +61,7 @@ public class ConfigManager {
 
 					// If in standalone mode, generate a secure random shared secret
 					if ("standalone".equals(expectedMode)) {
-						String randomSecret = generateRandomSecret();
+						String randomSecret = CryptUtils.generateRandomString(32);
 						template = template.replace("shared_secret: \"to_be_auto_replaced\"", StringUtils.format("shared_secret: \"{}\"", randomSecret));
 					}
 
@@ -106,18 +105,6 @@ public class ConfigManager {
 			LOGGER.error(I18nManager.getDmccTranslation("utils.config.config.load_failed"), e);
 			return false;
 		}
-	}
-
-	/**
-	 * Generates a cryptographically strong random string for the shared secret.
-	 *
-	 * @return A random 32-character string.
-	 */
-	private static String generateRandomSecret() {
-		SecureRandom random = new SecureRandom();
-		byte[] bytes = new byte[24]; // 24 bytes becomes 32 chars in Base64
-		random.nextBytes(bytes);
-		return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
 	}
 
 	/**
