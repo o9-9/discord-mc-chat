@@ -59,11 +59,11 @@ discord:
     reply_failed_detail: "This is expected behavior for reload/shutdown commands."
 
 server:
-  discord_init_failed: "Failed to initialize Discord Manager. Aborting DMCC-Server startup."
-  startup_interrupted: "DMCC-Server startup was interrupted."
+  discord_init_failed: "Failed to initialize Discord Manager. Aborting DMCC Server startup."
+  startup_interrupted: "DMCC Server startup was interrupted."
 
 client:
-  startup_interrupted: "DMCC-Client startup was interrupted."
+  startup_interrupted: "DMCC Client startup was interrupted."
 
 utils:
   config:

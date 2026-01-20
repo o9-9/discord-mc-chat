@@ -59,11 +59,11 @@ discord:
     reply_failed_detail: "对于 reload/shutdown 命令，这是预期的行为。"
 
 server:
-  discord_init_failed: "初始化 Discord Manager 失败。正在中止 DMCC-Server 启动。"
-  startup_interrupted: "DMCC-Server 启动被中断。"
+  discord_init_failed: "初始化 Discord Manager 失败。正在中止 DMCC 服务端启动。"
+  startup_interrupted: "DMCC 服务端启动被中断。"
 
 client:
-  startup_interrupted: "DMCC-Client 启动被中断。"
+  startup_interrupted: "DMCC 客户端启动被中断。"
 
 utils:
   config:
