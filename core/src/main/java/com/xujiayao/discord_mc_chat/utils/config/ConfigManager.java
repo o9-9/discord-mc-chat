@@ -11,6 +11,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.function.Function;
 
 import static com.xujiayao.discord_mc_chat.Constants.LOGGER;
@@ -58,6 +60,12 @@ public class ConfigManager {
 					// This ensures the generated config file uses the user's system language if supported.
 					template = template.replace("language: \"to_be_auto_replaced\"", StringUtils.format("language: \"{}\"", I18nManager.getLanguage()));
 
+					// If in standalone mode, generate a secure random shared secret
+					if ("standalone".equals(expectedMode)) {
+						String randomSecret = generateRandomSecret();
+						template = template.replace("shared_secret: \"to_be_auto_replaced\"", StringUtils.format("shared_secret: \"{}\"", randomSecret));
+					}
+
 					// Write the config file with the replaced language setting
 					Files.writeString(CONFIG_FILE_PATH, template, StandardCharsets.UTF_8);
 				}
@@ -98,6 +106,18 @@ public class ConfigManager {
 			LOGGER.error(I18nManager.getDmccTranslation("utils.config.config.load_failed"), e);
 			return false;
 		}
+	}
+
+	/**
+	 * Generates a cryptographically strong random string for the shared secret.
+	 *
+	 * @return A random 32-character string.
+	 */
+	private static String generateRandomSecret() {
+		SecureRandom random = new SecureRandom();
+		byte[] bytes = new byte[24]; // 24 bytes becomes 32 chars in Base64
+		random.nextBytes(bytes);
+		return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
 	}
 
 	/**
