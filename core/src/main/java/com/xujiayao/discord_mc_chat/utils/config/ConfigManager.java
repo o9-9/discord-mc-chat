@@ -43,7 +43,7 @@ public class ConfigManager {
 
 			// If config.yml does not exist or is empty, create it from the appropriate template.
 			if (!Files.exists(CONFIG_FILE_PATH) || Files.size(CONFIG_FILE_PATH) == 0) {
-				LOGGER.warn(I18nManager.getDmccTranslation("utils.config.config.not_found"));
+				LOGGER.error(I18nManager.getDmccTranslation("utils.config.config.not_found"));
 				LOGGER.info(I18nManager.getDmccTranslation("utils.config.config.creating", CONFIG_FILE_PATH));
 				LOGGER.info(I18nManager.getDmccTranslation("utils.config.config.edit_prompt", CONFIG_FILE_PATH));
 
