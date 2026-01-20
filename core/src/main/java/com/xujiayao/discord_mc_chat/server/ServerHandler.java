@@ -44,7 +44,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Packet> {
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) {
 		if (clientName != null) {
-			LOGGER.info(I18nManager.getDmccTranslation("network.server.client_disconnected_normal", clientName));
+			LOGGER.info(I18nManager.getDmccTranslation("server.network.client_disconnected_normal", clientName));
 		}
 	}
 
@@ -53,15 +53,17 @@ public class ServerHandler extends SimpleChannelInboundHandler<Packet> {
 		switch (packet) {
 			case HandshakePacket p -> {
 				if (!isWhitelisted(p.serverName)) {
-					LOGGER.warn(I18nManager.getDmccTranslation("network.server.whitelist_refused", p.serverName));
-					ctx.writeAndFlush(new DisconnectPacket("network.disconnect.not_whitelisted", p.serverName));
+					String reason = I18nManager.getDmccTranslation("server.network.disconnect_reasons.not_whitelisted", p.serverName);
+					LOGGER.warn(I18nManager.getDmccTranslation("server.network.reject", clientName, reason));
+					ctx.writeAndFlush(new DisconnectPacket("server.network.disconnect_reasons.not_whitelisted", p.serverName));
 					ctx.close();
 					return;
 				}
 
 				if (!Constants.VERSION.equals(p.version)) {
-					LOGGER.warn(I18nManager.getDmccTranslation("network.server.version_mismatch", p.version, Constants.VERSION));
-					ctx.writeAndFlush(new DisconnectPacket("network.disconnect.version_mismatch", p.version, Constants.VERSION));
+					String reason = I18nManager.getDmccTranslation("server.network.disconnect_reasons.version_mismatch", p.version, Constants.VERSION);
+					LOGGER.warn(I18nManager.getDmccTranslation("server.network.reject", clientName, reason));
+					ctx.writeAndFlush(new DisconnectPacket("server.network.disconnect_reasons.version_mismatch", p.version, Constants.VERSION));
 					ctx.close();
 					return;
 				}
@@ -75,12 +77,13 @@ public class ServerHandler extends SimpleChannelInboundHandler<Packet> {
 
 				if (correctHash.equals(p.hash)) {
 					this.authenticated = true;
-					LOGGER.info(I18nManager.getDmccTranslation("network.server.auth_success", clientName));
+					LOGGER.info(I18nManager.getDmccTranslation("server.network.auth_success", clientName));
 					ctx.writeAndFlush(new LoginSuccessPacket(ConfigManager.getString("language")));
 					// TODO: Add to active clients list
 				} else {
-					LOGGER.warn(I18nManager.getDmccTranslation("network.server.auth_failed", clientName));
-					ctx.writeAndFlush(new DisconnectPacket("network.disconnect.auth_failed"));
+					String reason = I18nManager.getDmccTranslation("server.network.disconnect_reasons.auth_failed");
+					LOGGER.warn(I18nManager.getDmccTranslation("server.network.reject", clientName, reason));
+					ctx.writeAndFlush(new DisconnectPacket("server.network.disconnect_reasons.auth_failed"));
 					ctx.close();
 				}
 			}
@@ -90,7 +93,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<Packet> {
 			case null, default -> {
 				// Handle other packets if authenticated
 				if (!authenticated) {
-					ctx.writeAndFlush(new DisconnectPacket("network.disconnect.not_authenticated"));
+					String reason = I18nManager.getDmccTranslation("server.network.disconnect_reasons.not_authenticated");
+					LOGGER.warn(I18nManager.getDmccTranslation("server.network.reject", clientName, reason));
+					ctx.writeAndFlush(new DisconnectPacket("server.network.disconnect_reasons.not_authenticated"));
 					ctx.close();
 				}
 			}
@@ -101,7 +106,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Packet> {
 	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
 		if (evt instanceof IdleStateEvent e) {
 			if (e.state() == IdleState.READER_IDLE) {
-				LOGGER.warn(I18nManager.getDmccTranslation("network.server.client_timeout", clientName != null ? clientName : "unknown"));
+				LOGGER.warn(I18nManager.getDmccTranslation("server.network.client_timeout", clientName != null ? clientName : "unknown"));
 				ctx.close();
 			}
 		} else {

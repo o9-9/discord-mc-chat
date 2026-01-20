@@ -41,11 +41,11 @@ public class ClientHandler extends SimpleChannelInboundHandler<Packet> {
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) {
-		LOGGER.info(I18nManager.getDmccTranslation("network.client.disconnected_generic"));
+		LOGGER.info(I18nManager.getDmccTranslation("client.network.disconnected_generic"));
 
 		// Trigger reconnection if this was not an intentional stop
 		if (client.isRunning()) {
-			LOGGER.info(I18nManager.getDmccTranslation("network.client.reconnecting"));
+			LOGGER.info(I18nManager.getDmccTranslation("client.network.reconnecting"));
 			client.scheduleReconnect();
 		}
 	}
@@ -58,7 +58,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<Packet> {
 
 		} else if (packet instanceof LoginSuccessPacket p) {
 			I18nManager.load(p.language);
-			LOGGER.info(I18nManager.getDmccTranslation("network.client.connected"));
+			LOGGER.info(I18nManager.getDmccTranslation("client.network.connected"));
 
 			if (!initialLoginFuture.isDone()) {
 				initialLoginFuture.complete(true);
@@ -66,7 +66,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<Packet> {
 
 		} else if (packet instanceof DisconnectPacket p) {
 			String reason = I18nManager.getDmccTranslation(p.key, p.args);
-			LOGGER.error(I18nManager.getDmccTranslation("network.client.disconnected_reason", reason));
+			LOGGER.error(I18nManager.getDmccTranslation("client.network.disconnected_reason", reason));
 
 			if (!initialLoginFuture.isDone()) {
 				initialLoginFuture.complete(false);
@@ -88,7 +88,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<Packet> {
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-		LOGGER.error(I18nManager.getDmccTranslation("network.client.connect_failed"), cause);
+		LOGGER.error(I18nManager.getDmccTranslation("client.network.connect_failed"), cause);
 		if (!initialLoginFuture.isDone()) {
 			initialLoginFuture.complete(false);
 		}

@@ -108,11 +108,13 @@ public class DMCC {
 						int port = serverInstance.start();
 
 						if (port == -1) {
+							LOGGER.error(I18nManager.getDmccTranslation("main.init.failed"));
 							return false;
 						} else {
 							// Client instance gets the same secret to authenticate
 							clientInstance = new ClientDMCC("127.0.0.1", port, internalServerName, internalSharedSecret);
 							if (!clientInstance.start()) {
+								LOGGER.error(I18nManager.getDmccTranslation("main.init.failed"));
 								return false;
 							}
 						}
@@ -125,6 +127,7 @@ public class DMCC {
 
 						clientInstance = new ClientDMCC(host, port, name, secret);
 						if (!clientInstance.start()) {
+							LOGGER.error(I18nManager.getDmccTranslation("main.init.failed"));
 							return false;
 						}
 					}
@@ -135,6 +138,7 @@ public class DMCC {
 
 						serverInstance = new ServerDMCC(host, port, secret);
 						if (serverInstance.start() == -1) {
+							LOGGER.error(I18nManager.getDmccTranslation("main.init.failed"));
 							return false;
 						}
 					}

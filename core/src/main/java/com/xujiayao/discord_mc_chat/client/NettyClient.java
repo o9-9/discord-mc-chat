@@ -71,7 +71,7 @@ public class NettyClient {
 			// Wait for the INITIAL handshake to complete
 			return initialLoginFuture.get(10, TimeUnit.SECONDS);
 		} catch (Exception e) {
-			LOGGER.error(I18nManager.getDmccTranslation("network.client.connect_failed"), e);
+			LOGGER.error(I18nManager.getDmccTranslation("client.network.connect_failed"), e);
 			stop();
 			return false;
 		}
@@ -99,7 +99,7 @@ public class NettyClient {
 		});
 
 		if (isInitialAttempt) {
-			LOGGER.info(I18nManager.getDmccTranslation("network.client.connecting", host, port));
+			LOGGER.info(I18nManager.getDmccTranslation("client.network.connecting", host, port));
 		}
 
 		b.connect(host, port).addListener((ChannelFuture future) -> {
@@ -110,7 +110,7 @@ public class NettyClient {
 				if (isInitialAttempt) {
 					initialLoginFuture.completeExceptionally(future.cause());
 				} else {
-					LOGGER.warn(I18nManager.getDmccTranslation("network.client.reconnect_failed", reconnectDelay.get()));
+					LOGGER.warn(I18nManager.getDmccTranslation("client.network.reconnect_failed", reconnectDelay.get()));
 					scheduleReconnect();
 				}
 			}

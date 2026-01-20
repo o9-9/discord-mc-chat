@@ -76,11 +76,11 @@ public class NettyServer {
 			ChannelFuture channelFuture = b.bind(host, port).sync();
 			int boundPort = ((InetSocketAddress) channelFuture.channel().localAddress()).getPort();
 
-			LOGGER.info(I18nManager.getDmccTranslation("network.server.listening", boundPort));
+			LOGGER.info(I18nManager.getDmccTranslation("server.network.listening", boundPort));
 			return boundPort;
 
 		} catch (Exception e) {
-			LOGGER.error(I18nManager.getDmccTranslation("network.server.bind_failed", port), e);
+			LOGGER.error(I18nManager.getDmccTranslation("server.network.bind_failed", port), e);
 			return -1;
 		}
 	}
