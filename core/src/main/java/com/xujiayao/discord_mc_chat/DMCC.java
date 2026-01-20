@@ -102,9 +102,9 @@ public class DMCC {
 						// Generate ephemeral credentials for internal loopback connection
 						String internalServerName = "Internal";
 						String internalSharedSecret = CryptUtils.generateRandomString(32);
-						
+
 						// Server instance gets the secret to verify the client
-						serverInstance = new ServerDMCC("127.0.0.1", 0, internalSharedSecret); 
+						serverInstance = new ServerDMCC("127.0.0.1", 0, internalSharedSecret);
 						int port = serverInstance.start();
 
 						if (port == -1) {
@@ -122,7 +122,7 @@ public class DMCC {
 						int port = ConfigManager.getInt("multi_server.connection.port");
 						String name = ConfigManager.getString("multi_server.server_name");
 						String secret = ConfigManager.getString("multi_server.connection.shared_secret");
-						
+
 						clientInstance = new ClientDMCC(host, port, name, secret);
 						if (!clientInstance.start()) {
 							return false;
@@ -132,7 +132,7 @@ public class DMCC {
 						String host = ConfigManager.getString("multi_server.connection.host");
 						int port = ConfigManager.getInt("multi_server.connection.port");
 						String secret = ConfigManager.getString("multi_server.connection.shared_secret");
-						
+
 						serverInstance = new ServerDMCC(host, port, secret);
 						if (serverInstance.start() == -1) {
 							return false;

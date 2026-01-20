@@ -31,17 +31,15 @@ import static com.xujiayao.discord_mc_chat.Constants.LOGGER;
  */
 public class NettyClient {
 
+	private static final int MAX_RECONNECT_DELAY = 512;
 	private final String host;
 	private final int port;
 	private final String serverName;
 	private final String sharedSecret;
-	private EventLoopGroup workerGroup;
-	private CompletableFuture<Boolean> initialLoginFuture;
-
-	// Reconnection settings
 	private final AtomicBoolean isRunning = new AtomicBoolean(false);
 	private final AtomicInteger reconnectDelay = new AtomicInteger(2); // Initial delay seconds
-	private static final int MAX_RECONNECT_DELAY = 512;
+	private EventLoopGroup workerGroup;
+	private CompletableFuture<Boolean> initialLoginFuture;
 
 	public NettyClient(String host, int port, String serverName, String sharedSecret) {
 		this.host = host;
@@ -49,11 +47,11 @@ public class NettyClient {
 		this.serverName = serverName;
 		this.sharedSecret = sharedSecret;
 	}
-	
+
 	public String getServerName() {
 		return serverName;
 	}
-	
+
 	public String getSharedSecret() {
 		return sharedSecret;
 	}
@@ -61,9 +59,9 @@ public class NettyClient {
 	public boolean start() {
 		isRunning.set(true);
 		initialLoginFuture = new CompletableFuture<>();
-		
+
 		// Use MultiThreadIoEventLoopGroup with NioIoHandler
-		workerGroup = new MultiThreadIoEventLoopGroup(0, 
+		workerGroup = new MultiThreadIoEventLoopGroup(0,
 				ExecutorServiceUtils.newThreadFactory("DMCC-NettyClient"),
 				NioIoHandler.newFactory());
 
@@ -135,7 +133,7 @@ public class NettyClient {
 			workerGroup.shutdownGracefully();
 		}
 	}
-	
+
 	public boolean isRunning() {
 		return isRunning.get();
 	}

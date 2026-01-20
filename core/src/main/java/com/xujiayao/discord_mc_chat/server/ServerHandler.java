@@ -9,8 +9,8 @@ import com.xujiayao.discord_mc_chat.network.packets.HandshakePacket;
 import com.xujiayao.discord_mc_chat.network.packets.KeepAlivePacket;
 import com.xujiayao.discord_mc_chat.network.packets.LoginSuccessPacket;
 import com.xujiayao.discord_mc_chat.network.packets.Packet;
-import com.xujiayao.discord_mc_chat.utils.config.ConfigManager;
 import com.xujiayao.discord_mc_chat.utils.CryptUtils;
+import com.xujiayao.discord_mc_chat.utils.config.ConfigManager;
 import com.xujiayao.discord_mc_chat.utils.config.ModeManager;
 import com.xujiayao.discord_mc_chat.utils.i18n.I18nManager;
 import io.netty.channel.ChannelHandlerContext;
@@ -31,7 +31,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Packet> {
 	private String expectedNonce;
 	private boolean authenticated = false;
 	private String clientName;
-	
+
 	public ServerHandler(NettyServer server) {
 		this.server = server;
 	}
@@ -40,7 +40,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<Packet> {
 	public void channelActive(ChannelHandlerContext ctx) {
 		// Wait for handshake
 	}
-	
+
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) {
 		if (clientName != null) {

@@ -39,17 +39,17 @@ public class NettyServer {
 		this.port = port;
 		this.sharedSecret = sharedSecret;
 	}
-	
+
 	public String getSharedSecret() {
 		return sharedSecret;
 	}
 
 	public int start() {
-		bossGroup = new MultiThreadIoEventLoopGroup(1, 
+		bossGroup = new MultiThreadIoEventLoopGroup(1,
 				ExecutorServiceUtils.newThreadFactory("DMCC-NettyServer-Boss"),
 				NioIoHandler.newFactory());
-		
-		workerGroup = new MultiThreadIoEventLoopGroup(0, 
+
+		workerGroup = new MultiThreadIoEventLoopGroup(0,
 				ExecutorServiceUtils.newThreadFactory("DMCC-NettyServer-Worker"),
 				NioIoHandler.newFactory());
 
@@ -75,7 +75,7 @@ public class NettyServer {
 
 			ChannelFuture channelFuture = b.bind(host, port).sync();
 			int boundPort = ((InetSocketAddress) channelFuture.channel().localAddress()).getPort();
-			
+
 			LOGGER.info(I18nManager.getDmccTranslation("network.server.listening", boundPort));
 			return boundPort;
 

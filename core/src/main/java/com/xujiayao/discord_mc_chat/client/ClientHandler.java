@@ -38,11 +38,11 @@ public class ClientHandler extends SimpleChannelInboundHandler<Packet> {
 	public void channelActive(ChannelHandlerContext ctx) {
 		ctx.writeAndFlush(new HandshakePacket(client.getServerName(), Constants.VERSION));
 	}
-	
+
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) {
 		LOGGER.info(I18nManager.getDmccTranslation("network.client.disconnected_generic"));
-		
+
 		// Trigger reconnection if this was not an intentional stop
 		if (client.isRunning()) {
 			LOGGER.info(I18nManager.getDmccTranslation("network.client.reconnecting"));
@@ -59,7 +59,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<Packet> {
 		} else if (packet instanceof LoginSuccessPacket p) {
 			I18nManager.load(p.language);
 			LOGGER.info(I18nManager.getDmccTranslation("network.client.connected"));
-			
+
 			if (!initialLoginFuture.isDone()) {
 				initialLoginFuture.complete(true);
 			}
@@ -67,7 +67,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<Packet> {
 		} else if (packet instanceof DisconnectPacket p) {
 			String reason = I18nManager.getDmccTranslation(p.key, p.args);
 			LOGGER.error(I18nManager.getDmccTranslation("network.client.disconnected_reason", reason));
-			
+
 			if (!initialLoginFuture.isDone()) {
 				initialLoginFuture.complete(false);
 			}
