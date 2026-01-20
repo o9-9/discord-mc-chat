@@ -2,8 +2,6 @@ package com.xujiayao.discord_mc_chat.utils.logging.impl;
 
 import com.xujiayao.discord_mc_chat.utils.EnvironmentUtils;
 import com.xujiayao.discord_mc_chat.utils.StringUtils;
-import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 
@@ -19,8 +17,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.fusesource.jansi.Ansi.ansi;
-
 /**
  * DMCC Logger implementation.
  *
@@ -30,13 +26,6 @@ public class LoggerImpl implements Logger {
 
 	private static volatile PrintWriter fileWriter;
 	private static boolean fileWriterInitialized = false;
-
-	// Ensure AnsiConsole is installed only once and only if in Standalone environment
-	static {
-		if (!EnvironmentUtils.isMinecraftEnvironment()) {
-			AnsiConsole.systemInstall();
-		}
-	}
 
 	private final String name;
 
@@ -109,9 +98,6 @@ public class LoggerImpl implements Logger {
 		if (fileWriter != null) {
 			fileWriter.close();
 		}
-		if (!EnvironmentUtils.isMinecraftEnvironment()) {
-			AnsiConsole.systemUninstall();
-		}
 	}
 
 	@Override
@@ -158,23 +144,15 @@ public class LoggerImpl implements Logger {
 				}
 			}
 
-			// 2. Log to Console (With Jansi Colors)
-			Ansi.Color color = switch (level) {
-				case "INFO" -> Ansi.Color.GREEN;
-				case "WARN" -> Ansi.Color.YELLOW;
-				case "ERROR" -> Ansi.Color.RED;
-				default -> Ansi.Color.DEFAULT;
+			// 2. Log to Console (With ANSI Color Codes)
+			String color = switch (level) {
+				case "INFO" -> "\u001B[32m";
+				case "WARN" -> "\u001B[33m";
+				case "ERROR" -> "\u001B[31m";
+				default -> "\u001B[0m";
 			};
 
-			// Build the colored string using Jansi fluent API
-			// Only color the LEVEL part
-			String consoleMessage = ansi()
-					.a("[").a(time).a("] ")
-					.a("[").a(thread).a("/").fg(color).a(level).reset().a("]: ")
-					.a(msg)
-					.toString();
-
-			System.out.println(consoleMessage);
+			System.out.println(StringUtils.format("[{}] [{}/{}{}\u001B[0m]: {}", time, thread, color, level, msg));
 
 			if (t != null) {
 				t.printStackTrace(System.out);
