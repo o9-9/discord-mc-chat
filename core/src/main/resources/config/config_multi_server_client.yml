@@ -17,6 +17,7 @@ multi_server:
   connection:
     host: "127.0.0.1"
     port: 5000
+    shared_secret: "your_shared_secret_here"
 
 # DMCC 命令权限设置
 # OP 等级对应的官方 Minecraft 权限级别：

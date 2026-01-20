@@ -20,7 +20,8 @@ public class YamlUtils {
 
 	private static final List<String> REQUIRED_MODIFIED_KEYS = List.of(
 			"discord.bot.token",
-			"multi_server.server_name"
+			"multi_server.server_name",
+			"multi_server.connection.shared_secret"
 	);
 
 	/**

@@ -19,6 +19,7 @@ multi_server:
   connection:
     host: "127.0.0.1"  # Limit accessibility, change to "0.0.0.0" if allow external connections
     port: 5000
+    shared_secret: "to_be_auto_replaced"
   servers:
     # This list acts as a whitelist. Only clients with a server name defined here are allowed to connect.
     - name: "SMP"
