@@ -105,7 +105,7 @@ public class NettyClient {
 		b.connect(host, port).addListener((ChannelFuture future) -> {
 			if (future.isSuccess()) {
 				// Connection established
-				reconnectDelay.set(2); // Reset delay on success
+				reconnectDelay.set(1); // Reset delay on success
 			} else {
 				if (isInitialAttempt) {
 					initialLoginFuture.completeExceptionally(future.cause());

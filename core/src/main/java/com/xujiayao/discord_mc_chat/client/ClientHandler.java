@@ -28,6 +28,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<Packet> {
 
 	private final NettyClient client;
 	private final CompletableFuture<Boolean> initialLoginFuture;
+	private boolean allowReconnect = true; // Default to true for network errors
 
 	public ClientHandler(NettyClient client, CompletableFuture<Boolean> initialLoginFuture) {
 		this.client = client;
@@ -41,12 +42,16 @@ public class ClientHandler extends SimpleChannelInboundHandler<Packet> {
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) {
-		LOGGER.info(I18nManager.getDmccTranslation("client.network.disconnected_generic"));
+		LOGGER.warn(I18nManager.getDmccTranslation("client.network.disconnected_generic"));
 
-		// Trigger reconnection if this was not an intentional stop
-		if (client.isRunning()) {
-			LOGGER.info(I18nManager.getDmccTranslation("client.network.reconnecting"));
+		// Trigger reconnection if this was not an intentional stop AND the server didn't explicitly reject us
+		if (client.isRunning() && allowReconnect) {
+			LOGGER.warn(I18nManager.getDmccTranslation("client.network.reconnecting"));
 			client.scheduleReconnect();
+		} else {
+			// If we are not allowed to reconnect, we should probably stop the client fully
+			// to prevent any background threads from lingering or confusing state.
+			client.stop();
 		}
 	}
 
@@ -65,6 +70,11 @@ public class ClientHandler extends SimpleChannelInboundHandler<Packet> {
 			}
 
 		} else if (packet instanceof DisconnectPacket p) {
+			// If we receive a DisconnectPacket, it means the server explicitly rejected us.
+			// In most cases (whitelist, auth fail, version mismatch), retrying immediately won't help.
+			// So we disable reconnection.
+			allowReconnect = false;
+
 			String reason = I18nManager.getDmccTranslation(p.key, p.args);
 			LOGGER.error(I18nManager.getDmccTranslation("client.network.disconnected_reason", reason));
 
