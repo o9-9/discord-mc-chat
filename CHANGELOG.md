@@ -1,6 +1,6 @@
 # Changelog 更新日志
 
-## Discord-MC-Chat 2.7.1 for Minecraft 1.14.4+ - 2025/12/11
+## Discord-MC-Chat 2.7.1-compat.1 for Minecraft 26.1 - 2026/3/25
 
 To use the new voice channel features, please grant your Discord bot the "Connect" permission in the "Voice Channel Permissions" section at your Discord server's "Roles" menu.
 
@@ -16,8 +16,8 @@ DMCC Discord 服务器现已公开！通过以下链接加入：https://discord.
 
 ## New Features 新特性
 
-- Compatible with Minecraft 1.21.11
-  兼容 Minecraft 1.21.11
+- Compatible with Minecraft 26.1
+  兼容 Minecraft 26.1
 
 ## Changes 更改
 
@@ -25,7 +25,8 @@ N/A
 
 ## Removed 移除
 
-N/A
+- Compat versions do not support multiple Minecraft versions at the same time
+  兼容版本不同时兼容多个 Minecraft 版本
 
 ## Contributors 贡献者
 
@@ -33,4 +34,4 @@ N/A
 
 ## Detailed Information 详细信息
 
-https://github.com/Xujiayao/Discord-MC-Chat/compare/2.7.0...2.7.1
+https://github.com/Xujiayao/Discord-MC-Chat/compare/2.7.1...2.7.1-compat.1
