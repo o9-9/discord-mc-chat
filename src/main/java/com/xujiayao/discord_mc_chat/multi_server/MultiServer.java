@@ -109,15 +109,7 @@ public class MultiServer extends Thread {
 
 					long epochSecond = Instant.now().getEpochSecond();
 
-					String topic = Translations.translateMessage("message.onlineChannelTopicForMultiServer")
-							.replace("%onlinePlayerCount%", Integer.toString(onlinePlayerCount))
-							.replace("%maxPlayerCount%", Integer.toString(maxPlayerCount))
-							.replace("%uniquePlayerCount%", Integer.toString(uniquePlayers.size()))
-							.replace("%onlineServerCount%", Integer.toString(onlineServerCount))
-							.replace("%onlineServerList%", String.join(", ", onlineServerList))
-							.replace("%serverStartedTime%", Long.toString(Collections.min(serverStartedTime)))
-							.replace("%lastUpdateTime%", Long.toString(epochSecond))
-							.replace("%nextUpdateTime%", Long.toString(epochSecond + CONFIG.generic.channelUpdateInterval / 1000));
+					String topic = Translations.translateMessage("message.onlineChannelTopicForMultiServer").replace("%onlinePlayerCount%", Integer.toString(onlinePlayerCount)).replace("%maxPlayerCount%", Integer.toString(maxPlayerCount)).replace("%uniquePlayerCount%", Integer.toString(uniquePlayers.size())).replace("%onlineServerCount%", Integer.toString(onlineServerCount)).replace("%onlineServerList%", String.join(", ", onlineServerList)).replace("%serverStartedTime%", Long.toString(Collections.min(serverStartedTime))).replace("%lastUpdateTime%", Long.toString(epochSecond)).replace("%nextUpdateTime%", Long.toString(epochSecond + CONFIG.generic.channelUpdateInterval / 1000));
 
 					CHANNEL.getManager().setTopic(topic).queue();
 
@@ -128,8 +120,7 @@ public class MultiServer extends Thread {
 
 				if (!CONFIG.generic.serverStatusVoiceChannelId.isEmpty()) {
 					int onlineServerCount = channelTopicInfoList.size();
-					String name = Translations.translateMessage("message.onlineServerStatusVoiceChannelNameForMultiServer")
-							.replace("%onlineServerCount%", Integer.toString(onlineServerCount));
+					String name = Translations.translateMessage("message.onlineServerStatusVoiceChannelNameForMultiServer").replace("%onlineServerCount%", Integer.toString(onlineServerCount));
 					SERVER_STATUS_VOICE_CHANNEL.getManager().setName(name).queue();
 				}
 
@@ -142,9 +133,7 @@ public class MultiServer extends Thread {
 						maxPlayerCount += infoJson.get("maxPlayerCount").getAsInt();
 					}
 
-					String name = Translations.translateMessage("message.onlinePlayerCountVoiceChannelName")
-							.replace("%onlinePlayerCount%", Integer.toString(onlinePlayerCount))
-							.replace("%maxPlayerCount%", Integer.toString(maxPlayerCount));
+					String name = Translations.translateMessage("message.onlinePlayerCountVoiceChannelName").replace("%onlinePlayerCount%", Integer.toString(onlinePlayerCount)).replace("%maxPlayerCount%", Integer.toString(maxPlayerCount));
 					PLAYER_COUNT_VOICE_CHANNEL.getManager().setName(name).queue();
 				}
 			}

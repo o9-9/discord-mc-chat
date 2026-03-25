@@ -19,23 +19,14 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.fabricmc.api.DedicatedServerModInitializer;
-//#if MC >= 11900
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-//#else
-//$$ import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-//#endif
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-//#if MC >= 11700
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-//#else
-//$$ import org.apache.logging.log4j.Logger;
-//$$ import org.apache.logging.log4j.LogManager;
-//#endif
 
 import java.io.File;
 import java.time.Duration;
@@ -49,11 +40,7 @@ import java.util.Timer;
 public class Main implements DedicatedServerModInitializer {
 
 	public static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
-	//#if MC >= 11700
 	public static final Logger LOGGER = LoggerFactory.getLogger("Discord-MC-Chat");
-	//#else
-	//$$ public static final Logger LOGGER = LogManager.getLogger("Discord-MC-Chat");
-	//#endif
 	public static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir().toFile(), "discord-mc-chat.json");
 	public static final File CONFIG_BACKUP_FILE = new File(FabricLoader.getInstance().getConfigDir().toFile(), "discord-mc-chat-backup.json");
 	public static final String VERSION = FabricLoader.getInstance().getModContainer("discord-mc-chat").orElseThrow().getMetadata().getVersion().getFriendlyString();
@@ -89,13 +76,7 @@ public class Main implements DedicatedServerModInitializer {
 			LOGGER.info("https://blog.xujiayao.com/posts/4ba0a17a/");
 			LOGGER.info("-----------------------------------------");
 
-			JDA = JDABuilder.createDefault(CONFIG.generic.botToken)
-					.setChunkingFilter(ChunkingFilter.ALL)
-					.setMemberCachePolicy(MemberCachePolicy.ALL)
-					.enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT)
-					.addEventListeners(new DiscordEventListener())
-					.setStatus(CONFIG.generic.showServerStatusInBotStatus ? OnlineStatus.DO_NOT_DISTURB : OnlineStatus.ONLINE)
-					.build();
+			JDA = JDABuilder.createDefault(CONFIG.generic.botToken).setChunkingFilter(ChunkingFilter.ALL).setMemberCachePolicy(MemberCachePolicy.ALL).enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.MESSAGE_CONTENT).addEventListeners(new DiscordEventListener()).setStatus(CONFIG.generic.showServerStatusInBotStatus ? OnlineStatus.DO_NOT_DISTURB : OnlineStatus.ONLINE).build();
 
 			JDA.awaitReady();
 
@@ -162,9 +143,7 @@ public class Main implements DedicatedServerModInitializer {
 				}
 
 				if (webhookName.equals(webhook.getName())) {
-					if (CONFIG.generic.useWebhook
-							&& webhook.getOwnerAsUser() == JDA.getSelfUser()
-							&& webhook.getChannel().asTextChannel() == CHANNEL) {
+					if (CONFIG.generic.useWebhook && webhook.getOwnerAsUser() == JDA.getSelfUser() && webhook.getChannel().asTextChannel() == CHANNEL) {
 						WEBHOOK = webhook;
 					} else {
 						webhook.delete().queue();
@@ -186,11 +165,7 @@ public class Main implements DedicatedServerModInitializer {
 			MULTI_SERVER.start();
 		}
 
-		//#if MC >= 11900
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> MinecraftCommands.register(dispatcher));
-		//#else
-		//$$ CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> MinecraftCommands.register(dispatcher));
-		//#endif
 
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			SERVER_STARTED_TIME = Long.toString(Instant.now().getEpochSecond());
@@ -212,9 +187,7 @@ public class Main implements DedicatedServerModInitializer {
 				Utils.initMsptMonitor();
 			}
 
-			if (CONFIG.generic.updateChannelTopic
-					|| !CONFIG.generic.serverStatusVoiceChannelId.isEmpty()
-					|| !CONFIG.generic.playerCountVoiceChannelId.isEmpty()) {
+			if (CONFIG.generic.updateChannelTopic || !CONFIG.generic.serverStatusVoiceChannelId.isEmpty() || !CONFIG.generic.playerCountVoiceChannelId.isEmpty()) {
 				if (!CONFIG.multiServer.enable) {
 					Utils.initChannelMonitor();
 				} else if (MULTI_SERVER.server != null) {
@@ -242,8 +215,7 @@ public class Main implements DedicatedServerModInitializer {
 			}
 
 			if (CONFIG.generic.updateChannelTopic) {
-				String topic = Translations.translateMessage("message.offlineChannelTopic")
-						.replace("%lastUpdateTime%", Long.toString(Instant.now().getEpochSecond()));
+				String topic = Translations.translateMessage("message.offlineChannelTopic").replace("%lastUpdateTime%", Long.toString(Instant.now().getEpochSecond()));
 
 				CHANNEL.getManager().setTopic(topic).queue();
 				if (!CONFIG.generic.consoleLogChannelId.isEmpty()) {
@@ -270,9 +242,7 @@ public class Main implements DedicatedServerModInitializer {
 			}
 
 			if (CONFIG.generic.announceServerStartStop) {
-				CHANNEL.sendMessage(Translations.translateMessage("message.serverStopped"))
-						.submit()
-						.whenComplete((v, ex) -> shutdown());
+				CHANNEL.sendMessage(Translations.translateMessage("message.serverStopped")).submit().whenComplete((v, ex) -> shutdown());
 			} else {
 				shutdown();
 			}

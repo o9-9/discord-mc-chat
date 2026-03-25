@@ -14,19 +14,9 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-//#if MC < 11900
-//$$ import net.minecraft.network.chat.TextComponent;
-//#endif
 import net.minecraft.network.chat.contents.TranslatableContents;
-//#if MC <= 11802
-//$$ import net.minecraft.server.level.ServerPlayer;
-//#endif
 import net.minecraft.world.entity.player.Player;
-//#if MC >= 12111
 import net.minecraft.world.level.gamerules.GameRules;
-//#else
-//$$ import net.minecraft.world.level.GameRules;
-//#endif
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -66,13 +56,8 @@ public class MinecraftEventListener {
 			String avatarUrl;
 
 			// TODO May directly link to PLAYER_MESSAGE
-			//#if MC > 11802
 			if (commandSourceStack.isPlayer()) {
 				avatarUrl = getAvatarUrl(commandSourceStack.getPlayer());
-			//#else
-			//$$ if (commandSourceStack.getEntity() instanceof ServerPlayer) {
-			//$$ 	avatarUrl = getAvatarUrl((ServerPlayer) commandSourceStack.getEntity());
-			//#endif
 			} else {
 				avatarUrl = JDA.getSelfUser().getAvatarUrl();
 			}
@@ -166,8 +151,7 @@ public class MinecraftEventListener {
 						}
 
 						String hyperlinkInsert;
-						if (Strings.CI.contains(link, "gif")
-								&& Strings.CI.contains(link, "tenor.com")) {
+						if (Strings.CI.contains(link, "gif") && Strings.CI.contains(link, "tenor.com")) {
 							hyperlinkInsert = "\"},{\"text\":\"<gif>\",\"underlined\":true,\"color\":\"yellow\",\"clickEvent\":{\"action\":\"open_url\",\"value\":\"" + protocol + link + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[{\"text\":\"Open URL\"}]}},{\"text\":\"";
 						} else {
 							hyperlinkInsert = "\"},{\"text\":\"" + protocol + link + "\",\"underlined\":true,\"color\":\"yellow\",\"clickEvent\":{\"action\":\"open_url\",\"value\":\"" + protocol + link + "\"},\"hoverEvent\":{\"action\":\"show_text\",\"contents\":[{\"text\":\"Open URL\"}]}},{\"text\":\"";
@@ -206,21 +190,10 @@ public class MinecraftEventListener {
 
 				MINECRAFT_SEND_COUNT++;
 				if (MINECRAFT_SEND_COUNT <= 20) {
-					//#if MC >= 11900
 					MutableComponent message = Component.literal("<" + Objects.requireNonNull(player.getDisplayName()).getString() + "> " + command);
-					//#else
-					//$$ MutableComponent message = new TextComponent("<" + Objects.requireNonNull(player.getDisplayName()).getString() + "> " + command);
-					//#endif
 
-					SERVER.getPlayerList().getPlayers().forEach(
-							player1 -> player1.displayClientMessage(message, false));
-					//#if MC >= 11900
+					SERVER.getPlayerList().getPlayers().forEach(player1 -> player1.sendSystemMessage(message, false));
 					SERVER.sendSystemMessage(message);
-					//#elseif MC > 11502
-					//$$ SERVER.sendMessage(message, player.getUUID());
-					//#else
-					//$$ SERVER.sendMessage(message);
-					//#endif
 
 					sendDiscordMessage(MarkdownSanitizer.escape(command), Objects.requireNonNull(player.getDisplayName()).getString(), getAvatarUrl(player));
 					if (CONFIG.multiServer.enable) {
@@ -231,27 +204,12 @@ public class MinecraftEventListener {
 		});
 
 		MinecraftEvents.PLAYER_ADVANCEMENT.register((player, advancementHolder, isDone) -> {
-			//#if MC >= 12002
 			if (advancementHolder.value().display().isEmpty()) {
 				return;
 			}
 			DisplayInfo display = advancementHolder.value().display().get();
-			//#else
-			//$$ if (advancementHolder.getDisplay() == null) {
-			//$$ 	return;
-			//$$ }
-			//$$ DisplayInfo display = advancementHolder.getDisplay();
-			//#endif
 
-			if (CONFIG.generic.announceAdvancements
-					&& isDone
-					&& display.shouldAnnounceChat()
-					//#if MC >= 12111
-					&& player.level().getGameRules().get(GameRules.SHOW_ADVANCEMENT_MESSAGES)
-					//#else
-					//$$ && player.level().getGameRules().getBoolean(GameRules.RULE_ANNOUNCE_ADVANCEMENTS)
-					//#endif
-			) {
+			if (CONFIG.generic.announceAdvancements && isDone && display.shouldAnnounceChat() && player.level().getGameRules().get(GameRules.SHOW_ADVANCEMENT_MESSAGES)) {
 				String message = "null";
 
 				switch (display.getType()) {
@@ -263,10 +221,7 @@ public class MinecraftEventListener {
 				String title = Translations.translate("advancements." + advancementHolder.id().getPath().replace("/", ".") + ".title");
 				String description = Translations.translate("advancements." + advancementHolder.id().getPath().replace("/", ".") + ".description");
 
-				message = message
-						.replace("%playerName%", MarkdownSanitizer.escape(Objects.requireNonNull(player.getDisplayName()).getString()))
-						.replace("%advancement%", title.contains("TranslateError") ? display.getTitle().getString() : title)
-						.replace("%description%", description.contains("TranslateError") ? display.getDescription().getString() : description);
+				message = message.replace("%playerName%", MarkdownSanitizer.escape(Objects.requireNonNull(player.getDisplayName()).getString())).replace("%advancement%", title.contains("TranslateError") ? display.getTitle().getString() : title).replace("%description%", description.contains("TranslateError") ? display.getDescription().getString() : description);
 
 				CHANNEL.sendMessage(message).queue();
 				if (CONFIG.multiServer.enable) {
@@ -277,20 +232,12 @@ public class MinecraftEventListener {
 
 		MinecraftEvents.PLAYER_DIE.register(player -> {
 			if (CONFIG.generic.announceDeathMessages) {
-				//#if MC >= 11900
 				TranslatableContents deathMessage = (TranslatableContents) player.getCombatTracker().getDeathMessage().getContents();
-				//#else
-				//$$ TranslatableComponent deathMessage = (TranslatableComponent) player.getCombatTracker().getDeathMessage();
-				//#endif
 				String key = deathMessage.getKey();
 
-				CHANNEL.sendMessage(Translations.translateMessage("message.deathMessage")
-						.replace("%deathMessage%", MarkdownSanitizer.escape(Translations.translate(key, deathMessage.getArgs())))
-						.replace("%playerName%", MarkdownSanitizer.escape(Objects.requireNonNull(player.getDisplayName()).getString()))).queue();
+				CHANNEL.sendMessage(Translations.translateMessage("message.deathMessage").replace("%deathMessage%", MarkdownSanitizer.escape(Translations.translate(key, deathMessage.getArgs()))).replace("%playerName%", MarkdownSanitizer.escape(Objects.requireNonNull(player.getDisplayName()).getString()))).queue();
 				if (CONFIG.multiServer.enable) {
-					MULTI_SERVER.sendMessage(false, false, false, null, Translations.translateMessage("message.deathMessage")
-							.replace("%deathMessage%", MarkdownSanitizer.escape(Translations.translate(key, deathMessage.getArgs())))
-							.replace("%playerName%", MarkdownSanitizer.escape(player.getDisplayName().getString())));
+					MULTI_SERVER.sendMessage(false, false, false, null, Translations.translateMessage("message.deathMessage").replace("%deathMessage%", MarkdownSanitizer.escape(Translations.translate(key, deathMessage.getArgs()))).replace("%playerName%", MarkdownSanitizer.escape(player.getDisplayName().getString())));
 				}
 			}
 		});
@@ -299,11 +246,9 @@ public class MinecraftEventListener {
 			Utils.setBotPresence();
 
 			if (CONFIG.generic.announcePlayerJoinLeave) {
-				CHANNEL.sendMessage(Translations.translateMessage("message.joinServer")
-						.replace("%playerName%", MarkdownSanitizer.escape(Objects.requireNonNull(player.getDisplayName()).getString()))).queue();
+				CHANNEL.sendMessage(Translations.translateMessage("message.joinServer").replace("%playerName%", MarkdownSanitizer.escape(Objects.requireNonNull(player.getDisplayName()).getString()))).queue();
 				if (CONFIG.multiServer.enable) {
-					MULTI_SERVER.sendMessage(false, false, false, null, Translations.translateMessage("message.joinServer")
-							.replace("%playerName%", MarkdownSanitizer.escape(player.getDisplayName().getString())));
+					MULTI_SERVER.sendMessage(false, false, false, null, Translations.translateMessage("message.joinServer").replace("%playerName%", MarkdownSanitizer.escape(player.getDisplayName().getString())));
 				}
 			}
 		});
@@ -312,11 +257,9 @@ public class MinecraftEventListener {
 			Utils.setBotPresence();
 
 			if (CONFIG.generic.announcePlayerJoinLeave) {
-				CHANNEL.sendMessage(Translations.translateMessage("message.leftServer")
-						.replace("%playerName%", MarkdownSanitizer.escape(Objects.requireNonNull(player.getDisplayName()).getString()))).queue();
+				CHANNEL.sendMessage(Translations.translateMessage("message.leftServer").replace("%playerName%", MarkdownSanitizer.escape(Objects.requireNonNull(player.getDisplayName()).getString()))).queue();
 				if (CONFIG.multiServer.enable) {
-					MULTI_SERVER.sendMessage(false, false, false, null, Translations.translateMessage("message.leftServer")
-							.replace("%playerName%", MarkdownSanitizer.escape(player.getDisplayName().getString())));
+					MULTI_SERVER.sendMessage(false, false, false, null, Translations.translateMessage("message.leftServer").replace("%playerName%", MarkdownSanitizer.escape(player.getDisplayName().getString())));
 				}
 			}
 		});
@@ -325,14 +268,9 @@ public class MinecraftEventListener {
 	private static void sendDiscordMessage(String content, String username, String avatar_url) {
 		if (!CONFIG.generic.useWebhook) {
 			if (CONFIG.multiServer.enable) {
-				CHANNEL.sendMessage(Translations.translateMessage("message.messageWithoutWebhookForMultiServer")
-						.replace("%server%", CONFIG.multiServer.name)
-						.replace("%name%", username)
-						.replace("%message%", content)).queue();
+				CHANNEL.sendMessage(Translations.translateMessage("message.messageWithoutWebhookForMultiServer").replace("%server%", CONFIG.multiServer.name).replace("%name%", username).replace("%message%", content)).queue();
 			} else {
-				CHANNEL.sendMessage(Translations.translateMessage("message.messageWithoutWebhook")
-						.replace("%name%", username)
-						.replace("%message%", content)).queue();
+				CHANNEL.sendMessage(Translations.translateMessage("message.messageWithoutWebhook").replace("%name%", username).replace("%message%", content)).queue();
 			}
 		} else {
 			JsonObject body = new JsonObject();
@@ -344,10 +282,7 @@ public class MinecraftEventListener {
 			allowedMentions.add("parse", new Gson().toJsonTree(CONFIG.generic.allowedMentions).getAsJsonArray());
 			body.add("allowed_mentions", allowedMentions);
 
-			Request request = new Request.Builder()
-					.url(WEBHOOK.getUrl())
-					.post(RequestBody.create(body.toString(), MediaType.get("application/json")))
-					.build();
+			Request request = new Request.Builder().url(WEBHOOK.getUrl()).post(RequestBody.create(body.toString(), MediaType.get("application/json"))).build();
 
 			ExecutorService executor = Executors.newFixedThreadPool(1);
 			executor.submit(() -> {
@@ -373,11 +308,7 @@ public class MinecraftEventListener {
 		String hash = "null";
 		if (CONFIG.generic.avatarApi.contains("{player_textures}")) {
 			try {
-				//#if MC > 12001
 				String textures = player.getGameProfile().properties().get("textures").iterator().next().value();
-				//#else
-				//$$ String textures = player.getGameProfile().getProperties().get("textures").iterator().next().getValue();
-				//#endif
 
 				JsonObject json = new Gson().fromJson(new String(Base64.getDecoder().decode(textures), StandardCharsets.UTF_8), JsonObject.class);
 				String url = json.getAsJsonObject("textures").getAsJsonObject("SKIN").get("url").getAsString();
@@ -387,9 +318,6 @@ public class MinecraftEventListener {
 			}
 		}
 
-		return CONFIG.generic.avatarApi
-				.replace("{player_uuid}", player.getUUID().toString())
-				.replace("{player_name}", player.getName().getString())
-				.replace("{player_textures}", hash);
+		return CONFIG.generic.avatarApi.replace("{player_uuid}", player.getUUID().toString()).replace("{player_name}", player.getName().getString()).replace("{player_textures}", hash);
 	}
 }

@@ -74,11 +74,7 @@ public class ConfigManager {
 
 	private static void create() {
 		try (FileOutputStream outputStream = new FileOutputStream(CONFIG_FILE)) {
-			String jsonString = new GsonBuilder()
-					.setPrettyPrinting()
-					.disableHtmlEscaping()
-					.create()
-					.toJson(new Config());
+			String jsonString = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(new Config());
 
 			IOUtils.write(jsonString, outputStream, StandardCharsets.UTF_8);
 		} catch (Exception e) {
@@ -88,11 +84,7 @@ public class ConfigManager {
 
 	private static void load() {
 		try {
-			CONFIG = new GsonBuilder()
-					.setPrettyPrinting()
-					.disableHtmlEscaping()
-					.create()
-					.fromJson(IOUtils.toString(CONFIG_FILE.toURI(), StandardCharsets.UTF_8), Config.class);
+			CONFIG = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().fromJson(IOUtils.toString(CONFIG_FILE.toURI(), StandardCharsets.UTF_8), Config.class);
 		} catch (Exception e) {
 			LOGGER.error(ExceptionUtils.getStackTrace(e));
 		}
@@ -100,11 +92,7 @@ public class ConfigManager {
 
 	public static void update() {
 		try (FileOutputStream outputStream = new FileOutputStream(CONFIG_FILE)) {
-			String jsonString = new GsonBuilder()
-					.setPrettyPrinting()
-					.disableHtmlEscaping()
-					.create()
-					.toJson(CONFIG);
+			String jsonString = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create().toJson(CONFIG);
 
 			IOUtils.write(jsonString, outputStream, StandardCharsets.UTF_8);
 		} catch (Exception e) {

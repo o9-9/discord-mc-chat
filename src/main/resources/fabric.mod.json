@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "discord-mc-chat-${mc_version}",
+  "id": "discord-mc-chat",
   "version": "${version}",
   "name": "Discord-MC-Chat",
   "description": "Discord-MC-Chat (DMCC), formerly known as MC-Discord-Chat and MCDiscordChat (MCDC), is a practical and powerful Fabric and Quilt Minecraft <> Discord chat bridge inspired by BRForgers/DisFabric",
@@ -24,7 +24,9 @@
     "discord-mc-chat.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.16.10",
-    "java": ">=21"
+    "fabricloader": ">=0.18.4",
+    "minecraft": "~26.1",
+    "java": ">=25",
+    "fabric-api": "*"
   }
 }

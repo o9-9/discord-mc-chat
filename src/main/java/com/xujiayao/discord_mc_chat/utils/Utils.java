@@ -7,12 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-//#if MC < 12109
-//$$ import com.mojang.authlib.GameProfile;
-//#endif
-//#if MC >= 12005
 import com.mojang.serialization.JsonOps;
-//#endif
 import com.xujiayao.discord_mc_chat.multi_server.MultiServer;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -25,26 +20,16 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.DetectedVersion;
-//#if MC >= 12005
 import net.minecraft.core.RegistryAccess;
-//#endif
 import net.minecraft.network.chat.Component;
-//#if MC >= 12005
 import net.minecraft.network.chat.ComponentSerialization;
-//#endif
 import net.minecraft.network.chat.MutableComponent;
-//#if MC > 12002
 import net.minecraft.server.ServerTickRateManager;
-//#endif
 import net.minecraft.server.level.ServerPlayer;
-//#if MC >= 12109
 import net.minecraft.server.players.NameAndId;
-//#endif
 import net.minecraft.server.players.UserWhiteList;
 import net.minecraft.server.players.UserWhiteListEntry;
-//#if MC > 11502
 import net.minecraft.util.TimeUtil;
-//#endif
 import net.minecraft.util.Tuple;
 import okhttp3.CacheControl;
 import okhttp3.Request;
@@ -127,10 +112,7 @@ public class Utils {
 
 	public static String checkUpdate(boolean isManualCheck) {
 		try {
-			Request request = new Request.Builder()
-					.url("https://cdn.jsdelivr.net/gh/Xujiayao/Discord-MC-Chat@master/update/versions.json")
-					.cacheControl(CacheControl.FORCE_NETWORK)
-					.build();
+			Request request = new Request.Builder().url("https://cdn.jsdelivr.net/gh/Xujiayao/Discord-MC-Chat@master/update/versions.json").cacheControl(CacheControl.FORCE_NETWORK).build();
 
 			try (Response response = HTTP_CLIENT.newCall(request).execute()) {
 				String result = Objects.requireNonNull(response.body()).string();
@@ -203,9 +185,7 @@ public class Utils {
 				StringBuilder message = new StringBuilder();
 
 				if (!latestVersion.equals(VERSION)) {
-					if (latestVersion.equals(CONFIG.latestVersion)
-							&& CONFIG.latestCheckTime > (System.currentTimeMillis() - 172800000)
-							&& !isManualCheck) {
+					if (latestVersion.equals(CONFIG.latestVersion) && CONFIG.latestCheckTime > (System.currentTimeMillis() - 172800000) && !isManualCheck) {
 						return "";
 					}
 
@@ -248,10 +228,7 @@ public class Utils {
 	public static String whitelist(String player) {
 		UserWhiteList whitelist = SERVER.getPlayerList().getWhiteList();
 
-		Request request = new Request.Builder()
-				.url("https://api.mojang.com/users/profiles/minecraft/" + player)
-				.cacheControl(CacheControl.FORCE_NETWORK)
-				.build();
+		Request request = new Request.Builder().url("https://api.mojang.com/users/profiles/minecraft/" + player).cacheControl(CacheControl.FORCE_NETWORK).build();
 
 		try (Response response = HTTP_CLIENT.newCall(request).execute()) {
 			if (response.body() != null && response.code() == 200) {
@@ -260,11 +237,7 @@ public class Utils {
 				UUID uuid = UUID.fromString(String.format("%s-%s-%s-%s-%s", id.substring(0, 8), id.substring(8, 12), id.substring(12, 16), id.substring(16, 20), id.substring(20, 32)));
 				String name = json.get("name").getAsString();
 
-				//#if MC >= 12109
 				NameAndId profile = new NameAndId(uuid, name);
-				//#else
-				//$$ GameProfile profile = new GameProfile(uuid, name);
-				//#endif
 				if (whitelist.isWhiteListed(profile)) {
 					return Translations.translate("utils.utils.whitelist.whitelistFailed");
 				} else {
@@ -362,9 +335,7 @@ public class Utils {
 				}
 
 				if (webhookName.equals(webhook.getName())) {
-					if (CONFIG.generic.useWebhook
-							&& webhook.getOwnerAsUser() == JDA.getSelfUser()
-							&& webhook.getChannel().asTextChannel() == CHANNEL) {
+					if (CONFIG.generic.useWebhook && webhook.getOwnerAsUser() == JDA.getSelfUser() && webhook.getChannel().asTextChannel() == CHANNEL) {
 						WEBHOOK = webhook;
 					} else {
 						webhook.delete().queue();
@@ -391,9 +362,7 @@ public class Utils {
 			}
 
 			CHANNEL_MONITOR_TIMER = new Timer();
-			if (CONFIG.generic.updateChannelTopic
-					|| !CONFIG.generic.serverStatusVoiceChannelId.isEmpty()
-					|| !CONFIG.generic.playerCountVoiceChannelId.isEmpty()) {
+			if (CONFIG.generic.updateChannelTopic || !CONFIG.generic.serverStatusVoiceChannelId.isEmpty() || !CONFIG.generic.playerCountVoiceChannelId.isEmpty()) {
 				new Timer().schedule(new TimerTask() {
 					@Override
 					public void run() {
@@ -434,30 +403,21 @@ public class Utils {
 
 		// TODO Simplify
 		for (int i = 0; i < 5; i++) {
-			if ((i == 0 && !CONFIG.generic.whitelistRequiresAdmin)
-					|| (i == 4 && isDiscordSide && CONFIG.generic.whitelistRequiresAdmin)
-					|| (i == 1 && !isDiscordSide && CONFIG.generic.whitelistRequiresAdmin)) {
+			if ((i == 0 && !CONFIG.generic.whitelistRequiresAdmin) || (i == 4 && isDiscordSide && CONFIG.generic.whitelistRequiresAdmin) || (i == 1 && !isDiscordSide && CONFIG.generic.whitelistRequiresAdmin)) {
 				message.append(isDiscordSide ? "\n/whitelist <player>  | " : "\n/dmcc whitelist <player>    | ");
 				message.append(Translations.translate("utils.utils.ubCommands.whitelist"));
 				if (CONFIG.generic.whitelistRequiresAdmin) {
 					message.append(Translations.translate("utils.utils.ghcMessage.adminOnly"));
 				}
-			} else if ((i == 1 && isDiscordSide && !CONFIG.generic.whitelistRequiresAdmin)
-					|| (i == 0 && isDiscordSide && CONFIG.generic.whitelistRequiresAdmin)
-					|| (i == 2 && !isDiscordSide)) {
+			} else if ((i == 1 && isDiscordSide && !CONFIG.generic.whitelistRequiresAdmin) || (i == 0 && isDiscordSide && CONFIG.generic.whitelistRequiresAdmin) || (i == 2 && !isDiscordSide)) {
 				message.append(isDiscordSide ? "\n/console <command>   | " : "\n~~/dmcc console <command>~~ | ");
 				message.append(Translations.translate("utils.utils.ubCommands.console"));
 				message.append(Translations.translate("utils.utils.ghcMessage.adminOnly"));
-			} else if ((i == 2 && isDiscordSide && !CONFIG.generic.whitelistRequiresAdmin)
-					|| (i == 1 && isDiscordSide && CONFIG.generic.whitelistRequiresAdmin)
-					|| (i == 3 && !isDiscordSide)) {
+			} else if ((i == 2 && isDiscordSide && !CONFIG.generic.whitelistRequiresAdmin) || (i == 1 && isDiscordSide && CONFIG.generic.whitelistRequiresAdmin) || (i == 3 && !isDiscordSide)) {
 				message.append(isDiscordSide ? "\n/log <file>          | " : "\n~~/dmcc log <file>~~        | ");
 				message.append(Translations.translate("utils.utils.ubCommands.log"));
 				message.append(Translations.translate("utils.utils.ghcMessage.adminOnly"));
-			} else if ((i == 3 && isDiscordSide && !CONFIG.generic.whitelistRequiresAdmin)
-					|| (i == 2 && isDiscordSide && CONFIG.generic.whitelistRequiresAdmin)
-					|| (i == 1 && !isDiscordSide && !CONFIG.generic.whitelistRequiresAdmin)
-					|| (i == 0 && !isDiscordSide && CONFIG.generic.whitelistRequiresAdmin)) {
+			} else if ((i == 3 && isDiscordSide && !CONFIG.generic.whitelistRequiresAdmin) || (i == 2 && isDiscordSide && CONFIG.generic.whitelistRequiresAdmin) || (i == 1 && !isDiscordSide && !CONFIG.generic.whitelistRequiresAdmin) || (i == 0 && !isDiscordSide && CONFIG.generic.whitelistRequiresAdmin)) {
 				message.append(isDiscordSide ? "\n/reload              | " : "\n/dmcc reload                | ");
 				message.append(Translations.translate("utils.utils.ubCommands.reload"));
 				message.append(Translations.translate("utils.utils.ghcMessage.adminOnly"));
@@ -472,10 +432,7 @@ public class Utils {
 	}
 
 	public static String getInfoCommandMessage() {
-		StringBuilder message = new StringBuilder()
-				.append("=============== ")
-				.append(Translations.translate("utils.utils.gicMessage.serverStatus"))
-				.append(" ===============\n\n");
+		StringBuilder message = new StringBuilder().append("=============== ").append(Translations.translate("utils.utils.gicMessage.serverStatus")).append(" ===============\n\n");
 
 		// Online players
 		List<ServerPlayer> onlinePlayers = SERVER.getPlayerList().getPlayers();
@@ -485,11 +442,7 @@ public class Utils {
 			message.append(Translations.translate("utils.utils.gicMessage.noPlayersOnline"));
 		} else {
 			for (ServerPlayer player : onlinePlayers) {
-				//#if MC >= 12002
 				message.append("[").append(player.connection.latency()).append("ms] ").append(Objects.requireNonNull(player.getDisplayName()).getString()).append("\n");
-				//#else
-				//$$ message.append("[").append(player.latency).append("ms] ").append(Objects.requireNonNull(player.getDisplayName()).getString()).append("\n");
-				//#endif
 			}
 		}
 
@@ -506,10 +459,7 @@ public class Utils {
 	}
 
 	public static String getStatsCommandMessage(String type, String name, boolean hasCharLimit) {
-		StringBuilder message = new StringBuilder()
-				.append("=============== ")
-				.append(Translations.translate("utils.utils.gscMessage.scoreboard"))
-				.append(" ===============\n");
+		StringBuilder message = new StringBuilder().append("=============== ").append(Translations.translate("utils.utils.gscMessage.scoreboard")).append(" ===============\n");
 
 		Map<String, Integer> stats = new HashMap<>();
 
@@ -531,11 +481,7 @@ public class Utils {
 						JsonObject json = new Gson().fromJson(IOUtils.toString(file.toURI(), StandardCharsets.UTF_8), JsonObject.class);
 
 						try {
-							stats.put(player.getAsJsonObject().get("name").getAsString(), json
-									.getAsJsonObject("stats")
-									.getAsJsonObject("minecraft:" + type)
-									.get("minecraft:" + name)
-									.getAsInt());
+							stats.put(player.getAsJsonObject().get("name").getAsString(), json.getAsJsonObject("stats").getAsJsonObject("minecraft:" + type).get("minecraft:" + name).getAsInt());
 						} catch (NullPointerException ignored) {
 						}
 					}
@@ -577,35 +523,16 @@ public class Utils {
 		}
 
 		if (!CONFIG.generic.botPlayingActivity.isEmpty()) {
-			JDA.getPresence().setActivity(Activity.playing(CONFIG.generic.botPlayingActivity
-					.replace("%onlinePlayerCount%", Integer.toString(SERVER.getPlayerCount()))
-					.replace("%maxPlayerCount%", Integer.toString(SERVER.getMaxPlayers()))));
+			JDA.getPresence().setActivity(Activity.playing(CONFIG.generic.botPlayingActivity.replace("%onlinePlayerCount%", Integer.toString(SERVER.getPlayerCount())).replace("%maxPlayerCount%", Integer.toString(SERVER.getMaxPlayers()))));
 		} else if (!CONFIG.generic.botListeningActivity.isEmpty()) {
-			JDA.getPresence().setActivity(Activity.listening(CONFIG.generic.botListeningActivity
-					.replace("%onlinePlayerCount%", Integer.toString(SERVER.getPlayerCount()))
-					.replace("%maxPlayerCount%", Integer.toString(SERVER.getMaxPlayers()))));
+			JDA.getPresence().setActivity(Activity.listening(CONFIG.generic.botListeningActivity.replace("%onlinePlayerCount%", Integer.toString(SERVER.getPlayerCount())).replace("%maxPlayerCount%", Integer.toString(SERVER.getMaxPlayers()))));
 		} else {
 			JDA.getPresence().setActivity(null);
 		}
 	}
 
 	public static void updateBotCommands() {
-		JDA.updateCommands()
-				.addCommands(Commands.slash("help", Translations.translate("utils.utils.ubCommands.help")))
-				.addCommands(Commands.slash("info", Translations.translate("utils.utils.ubCommands.info")))
-				.addCommands(Commands.slash("stats", Translations.translate("utils.utils.ubCommands.stats"))
-						.addOption(OptionType.STRING, "type", Translations.translate("utils.utils.ubCommands.stats.type"), true)
-						.addOption(OptionType.STRING, "name", Translations.translate("utils.utils.ubCommands.stats.name"), true))
-				.addCommands(Commands.slash("update", Translations.translate("utils.utils.ubCommands.update")))
-				.addCommands(Commands.slash("whitelist", Translations.translate("utils.utils.ubCommands.whitelist"))
-						.addOption(OptionType.STRING, "player", Translations.translate("utils.utils.ubCommands.whitelist.player"), true))
-				.addCommands(Commands.slash("console", Translations.translate("utils.utils.ubCommands.console"))
-						.addOption(OptionType.STRING, "command", Translations.translate("utils.utils.ubCommands.console.command"), true, true))
-				.addCommands(Commands.slash("log", Translations.translate("utils.utils.ubCommands.log"))
-						.addOption(OptionType.STRING, "file", Translations.translate("utils.utils.ubCommands.log.file"), true, true))
-				.addCommands(Commands.slash("reload", Translations.translate("utils.utils.ubCommands.reload")))
-				.addCommands(Commands.slash("stop", Translations.translate("utils.utils.ubCommands.stop")))
-				.queue();
+		JDA.updateCommands().addCommands(Commands.slash("help", Translations.translate("utils.utils.ubCommands.help"))).addCommands(Commands.slash("info", Translations.translate("utils.utils.ubCommands.info"))).addCommands(Commands.slash("stats", Translations.translate("utils.utils.ubCommands.stats")).addOption(OptionType.STRING, "type", Translations.translate("utils.utils.ubCommands.stats.type"), true).addOption(OptionType.STRING, "name", Translations.translate("utils.utils.ubCommands.stats.name"), true)).addCommands(Commands.slash("update", Translations.translate("utils.utils.ubCommands.update"))).addCommands(Commands.slash("whitelist", Translations.translate("utils.utils.ubCommands.whitelist")).addOption(OptionType.STRING, "player", Translations.translate("utils.utils.ubCommands.whitelist.player"), true)).addCommands(Commands.slash("console", Translations.translate("utils.utils.ubCommands.console")).addOption(OptionType.STRING, "command", Translations.translate("utils.utils.ubCommands.console.command"), true, true)).addCommands(Commands.slash("log", Translations.translate("utils.utils.ubCommands.log")).addOption(OptionType.STRING, "file", Translations.translate("utils.utils.ubCommands.log.file"), true, true)).addCommands(Commands.slash("reload", Translations.translate("utils.utils.ubCommands.reload"))).addCommands(Commands.slash("stop", Translations.translate("utils.utils.ubCommands.stop"))).queue();
 	}
 
 	public static void initMsptMonitor() {
@@ -615,9 +542,7 @@ public class Utils {
 				double mspt = getTickInfo().getB();
 
 				if (mspt > CONFIG.generic.msptLimit) {
-					String message = Translations.translateMessage("message.highMspt")
-							.replace("%mspt%", String.format("%.2f", mspt))
-							.replace("%msptLimit%", Integer.toString(CONFIG.generic.msptLimit));
+					String message = Translations.translateMessage("message.highMspt").replace("%mspt%", String.format("%.2f", mspt)).replace("%msptLimit%", Integer.toString(CONFIG.generic.msptLimit));
 
 					CHANNEL.sendMessage(message).queue();
 					if (CONFIG.multiServer.enable) {
@@ -647,13 +572,7 @@ public class Utils {
 						} catch (Exception ignored) {
 						}
 
-						String topic = Translations.translateMessage("message.onlineChannelTopic")
-								.replace("%onlinePlayerCount%", Integer.toString(SERVER.getPlayerCount()))
-								.replace("%maxPlayerCount%", Integer.toString(SERVER.getMaxPlayers()))
-								.replace("%uniquePlayerCount%", Integer.toString(uniquePlayerCount))
-								.replace("%serverStartedTime%", SERVER_STARTED_TIME)
-								.replace("%lastUpdateTime%", Long.toString(epochSecond))
-								.replace("%nextUpdateTime%", Long.toString(epochSecond + CONFIG.generic.channelUpdateInterval / 1000));
+						String topic = Translations.translateMessage("message.onlineChannelTopic").replace("%onlinePlayerCount%", Integer.toString(SERVER.getPlayerCount())).replace("%maxPlayerCount%", Integer.toString(SERVER.getMaxPlayers())).replace("%uniquePlayerCount%", Integer.toString(uniquePlayerCount)).replace("%serverStartedTime%", SERVER_STARTED_TIME).replace("%lastUpdateTime%", Long.toString(epochSecond)).replace("%nextUpdateTime%", Long.toString(epochSecond + CONFIG.generic.channelUpdateInterval / 1000));
 
 						CHANNEL.getManager().setTopic(topic).queue();
 
@@ -668,9 +587,7 @@ public class Utils {
 					}
 
 					if (!CONFIG.generic.playerCountVoiceChannelId.isEmpty()) {
-						String name = Translations.translateMessage("message.onlinePlayerCountVoiceChannelName")
-								.replace("%onlinePlayerCount%", Integer.toString(SERVER.getPlayerCount()))
-								.replace("%maxPlayerCount%", Integer.toString(SERVER.getMaxPlayers()));
+						String name = Translations.translateMessage("message.onlinePlayerCountVoiceChannelName").replace("%onlinePlayerCount%", Integer.toString(SERVER.getPlayerCount())).replace("%maxPlayerCount%", Integer.toString(SERVER.getMaxPlayers()));
 						PLAYER_COUNT_VOICE_CHANNEL.getManager().setName(name).queue();
 					}
 				} catch (Exception e) {
@@ -698,7 +615,6 @@ public class Utils {
 	}
 
 	private static Tuple<Double, Double> getTickInfo() {
-		//#if MC > 12002
 		ServerTickRateManager manager = SERVER.tickRateManager();
 
 		double mspt = ((double) SERVER.getAverageTickTimeNanos()) / TimeUtil.NANOSECONDS_PER_MILLISECOND;
@@ -707,30 +623,17 @@ public class Utils {
 		if (manager.isFrozen()) {
 			tps = 0;
 		}
-		//#else
-		//$$ // TODO Compat TPS & MSPT (Issue #217)
-		//$$ double mspt = SERVER.getAverageTickTime();
-		//$$ double tps = Math.min(1000.0 / mspt, 20);
-		//#endif
 
 		return new Tuple<>(tps, mspt);
 	}
 
 	public static MutableComponent fromJson(String json) {
 		JsonElement jsonElement = JsonParser.parseString(json);
-		//#if MC >= 12005
 		return jsonElement == null ? null : (MutableComponent) ComponentSerialization.CODEC.parse(RegistryAccess.EMPTY.createSerializationContext(JsonOps.INSTANCE), jsonElement).getOrThrow();
-		//#else
-		//$$ return Component.Serializer.fromJson(json);
-		//#endif
 	}
 
 	public static String toJson(Component component) {
-		//#if MC >= 12005
 		return new Gson().toJson(ComponentSerialization.CODEC.encodeStart(RegistryAccess.EMPTY.createSerializationContext(JsonOps.INSTANCE), component).getOrThrow());
-		//#else
-		//$$ return Component.Serializer.toJson(component);
-		//#endif
 	}
 
 	public static String sanitize(String in) {
